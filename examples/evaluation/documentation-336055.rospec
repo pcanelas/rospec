@@ -1,0 +1,5 @@
+type alias Radian: float;
+
+node type imu_compass_driver_type {
+    optional param /imu/declination: Radian = 0.0;
+}

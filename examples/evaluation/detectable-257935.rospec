@@ -1,0 +1,12 @@
+node type custom_node_type {
+    subscribes to imu_data: sensor_msgs/Imu;
+}
+
+node type gazebo_ros_imu_type {
+    publishes to imu/data: sensor_msgs/Imu;
+}
+
+system {
+    node instance custom_node: custom_node_type { }
+    node instance gazebo: gazebo_ros_imu_type { }
+}

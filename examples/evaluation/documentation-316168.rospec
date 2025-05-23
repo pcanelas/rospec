@@ -1,0 +1,4 @@
+node type ekf_localization_node_type {
+    # Parameter that provides an initial state
+    param initial_state: int[][];
+}

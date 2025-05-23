@@ -1,0 +1,18 @@
+node type custom_node_type {
+    publishes to odom: nav_msgs/Odometry;
+    broadcast odom to base_link;
+}
+
+node type hector_mapping_type {
+    optional param base_frame: string = "base_link";
+    optional param odom_frame: string = "odom";
+    listen content(base_frame) to content(odom_frame);
+    broadcast map to odom;
+}
+
+system {
+    node instance custom_node: custom_node_type { }
+    node instance hector_mapping: hector_mapping_type {
+        param odom_frame = "base_link";
+    }
+}

@@ -1,0 +1,17 @@
+node type rgbdslam_type {
+    param fixed_frame_name: string;
+    param ground_truth_frame_name: string;
+    param base_frame_name: string;
+    optional param fixed_camera: bool = false;
+} where {
+    base_frame_name == "odom" -> !exists(fixed_camera);
+}
+
+system {
+    node instance rgbdslam: rgbdslam_type {
+        param fixed_frame_name = "/map";
+        param ground_truth_frame_name = "";
+        param base_frame_name = "odom";
+        param fixed_camera = true;
+    }
+}

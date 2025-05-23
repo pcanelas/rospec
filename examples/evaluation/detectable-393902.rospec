@@ -1,0 +1,18 @@
+node type ekf_filter_node_type {
+    param odom0_config: bool[];
+    optional param two_d_mode: bool = false;
+} where {
+    two_d_mode -> odom0_config[6] and odom0_config[7];
+}
+
+system {
+    node instance ekf_filter_node: ekf_filter_node_type {
+        param odom0_config =
+                   [false,  false,  false,
+                    false, false, false,
+                    false, false, false,
+                    false, false, true,
+                    false, false, false];
+        param two_d_mode = true;
+    }
+}

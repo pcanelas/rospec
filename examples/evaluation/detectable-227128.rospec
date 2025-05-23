@@ -1,0 +1,35 @@
+node type node0_type {
+    publishes to /car/odometry: nav_msgs/Odometry;
+
+    broadcast odom to base_footprint;
+}
+
+node type node1_type {
+    publishes to /car/odometro: nav_msgs/Odometry;
+
+    broadcast odo to base_footprint;
+}
+
+node type gps_node_type {
+    publishes to /car/gps: sensor_msgs/NavSatFix; # Assumed the message type
+
+    broadcast gps to base_footprint;
+}
+
+node type robot_localization_ekf_type {
+    subscribes to /car/odometry: nav_msgs/Odometry;
+    subscribes to /car/odometro: nav_msgs/Odometry;
+    subscribes to /car/gps: sensor_msgs/NavSatFix;
+
+    listen odom to base_footprint;
+}
+
+system {
+    node instance node0: node0_type { }
+    node instance node1: node1_type { }
+
+    node instance gps_node: gps_node_type { }
+    node instance robot_localization_ekf: robot_localization_ekf_type { }
+
+    # The arguments and parameters are not define to provide a minimal example of the misconfiguration
+}

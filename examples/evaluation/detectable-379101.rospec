@@ -1,0 +1,12 @@
+node type robot_state_publisher_type {
+    context number_of_robots: int;
+    optional param tf_prefix: string = "";
+} where {
+    number_of_robots > 1 -> exists(tf_prefix);
+}
+
+system {
+    node instance robot_state_publisher: robot_state_publisher_type {
+        context number_of_robots = 2;
+    }
+}

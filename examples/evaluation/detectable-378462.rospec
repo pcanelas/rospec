@@ -1,0 +1,9 @@
+node type ekf_filter_node_type {
+    optional param world_frame: string = "odom";
+}
+
+system {
+    node instance ekf_filter_node:  ekf_filter_node_type {
+        param worl_frame = "map";
+    }
+}

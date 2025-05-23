@@ -1,0 +1,8 @@
+node type usb_cam_node {
+    publishes to image: sensor_msgs/Image where {count(publishers(_)) == 1};
+}
+
+system {
+    node instance usb_cam1: usb_cam_node { }
+    node instance usb_cam2: usb_cam_node { }
+}

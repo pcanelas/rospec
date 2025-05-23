@@ -1,0 +1,14 @@
+policy instance depth10qos: qos {
+    setting history = KeepLast;
+    setting depth = 10;
+}
+
+node type worker_type {
+    @qos{depth10qos}
+    publishes to /mico_arm_driver/in/cartesian_velocity: geometry_msgs/TwistStamped where {count(publishers(_)) == 1};
+}
+
+system {
+    node instance worker1: worker_type {}
+    node instance worker2s: worker_type {}
+}

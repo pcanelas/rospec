@@ -1,0 +1,18 @@
+node type planning_scene_warehouse_viewer_t {
+    context is_simulation: bool;
+
+    optional argument use_monitor: bool = false;
+    optional argument use_collision_map: bool = false;
+    optional param use_robot_data: bool = false;
+
+    subscribes to /joint_states: sensor_msgs/JointState; # assuming {use_monitor};
+} where {
+    is_simulation -> use_monitor;
+    is_simulation -> !use_robot_data;
+}
+
+system {
+    node instance planning_scene_warehouse_viewer: planning_scene_warehouse_viewer_t {
+        context is_simulation = true;
+    }
+}

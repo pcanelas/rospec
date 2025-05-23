@@ -1,0 +1,12 @@
+node type hector_mapping_type {
+    context is_simulation: bool;
+    optional param use_sim_time: bool = false;
+} where {
+    is_simulation -> use_sim_time;
+}
+
+system {
+    node instance hector_mapping: hector_mapping_type {
+        context is_simulation = true;
+    }
+}

@@ -1,0 +1,10 @@
+node type hokuyo_node_type {
+    context sensor_max_angle_fov: double;
+    context sensor_min_angle_fov: double;
+
+    param min_ang_limit: double;
+    param max_ang_limit: double;
+} where {
+    min_ang_limit <= sensor_min_angle_fov;
+    max_ang_limit <= sensor_max_angle_fov;
+}

@@ -1,0 +1,1 @@
+Dependency object_avoidance -> !(useNavGoalToSetStaticObstacle) not satisfied in op_motion_simulation

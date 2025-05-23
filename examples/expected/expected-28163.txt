@@ -1,0 +1,2 @@
+Dependency is_simulation -> use_monitor and is_simulation -> !(use_robot_data) not satisfied in planning_scene_warehouse_viewer
+Publisher not found for subscriber /joint_states

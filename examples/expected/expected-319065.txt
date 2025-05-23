@@ -1,0 +1,1 @@
+Dependency odom_model_type == OmniCorrected -> exists(odom_alpha5) and odom_model_type == DiffCorrected -> odom_alpha1 <= 0.01 and odom_alpha2 <= 0.01 and odom_alpha3 <= 0.01 and odom_alpha4 <= 0.01 not satisfied in amcl

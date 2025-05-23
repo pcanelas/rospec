@@ -1,0 +1,49 @@
+message geometry_msgs/Vector3 {
+    field x: float64;
+    field y: float64;
+    field z: float64;
+}
+
+message geometry_msgs/Twist {
+    field linear: geometry_msgs/Vector3;
+    field angular: geometry_msgs/Vector3;
+}
+
+message geometry_msgs/TwistStamped {
+    field header: std_msgs/Header;
+    field twist: geometry_msgs/Twist;
+}
+
+message geometry_msgs/Pose2D {
+    field x: float64;
+    field y: float64;
+    field theta: float64;
+}
+
+message geometry_msgs/PoseWithCovarianceStamped {
+    field header: std_msgs/Header;
+    field pose: geometry_msgs/PoseWithCovariance;
+}
+
+message geometry_msgs/PoseWithCovariance {
+    field pose: geometry_msgs/Pose;
+    field covariance: float64[36];
+}
+
+message geometry_msgs/Pose {
+    field position: geometry_msgs/Point;
+    field orientation: geometry_msgs/Quaternion;
+}
+
+message geometry_msgs/Point {
+    field x: float64;
+    field y: float64;
+    field z: float64;
+}
+
+message geometry_msgs/Quaternion {
+    field x: float64;
+    field y: float64;
+    field z: float64;
+    field w: float64;
+}

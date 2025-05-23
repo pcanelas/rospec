@@ -1,0 +1,94 @@
+message sensor_msgs/PointCloud2 {
+    field header: std_msgs/Header;
+    field height: uint32;
+    field width: uint32;
+    field fields: sensor_msgs/PointField[];
+    field is_bigendian: bool;
+    field point_step: uint32;
+    field row_step: uint32;
+    field data: uint8[];
+    field is_dense: bool;
+}
+
+message sensor_msgs/JointState {
+    field header: std_msgs/Header;
+    field name: string[];
+    field position: float64[];
+    field velocity: float64[];
+    field effort: float64[];
+}
+
+message sensor_msgs/Imu {
+    field header: std_msgs/Header;
+    field orientation: geometry_msgs/Quaternion;
+    field orientation_covariance: float64[9];
+    field angular_velocity: geometry_msgs/Vector3;
+    field angular_velocity_covariance: float64[9];
+    field linear_acceleration: geometry_msgs/Vector3;
+}
+
+message sensor_msgs/Image {
+    field header: std_msgs/Header;
+    field height: uint32;
+    field width: uint32;
+    field encoding: string;
+    field is_bigendian: uint8;
+    field step: uint32;
+    field data: uint8[];
+}
+
+message sensor_msgs/MultiEchoLaserScan {
+    field header: std_msgs/Header;
+    field angle_min: float32;
+    field angle_max: float32;
+    field angle_increment: float32;
+    field time_increment: float32;
+    field scan_time: float32;
+    field range_min: float32;
+    field range_max: float32;
+    field ranges: sensor_msgs/LaserEcho[];
+    field intensities: sensor_msgs/LaserEcho[];
+}
+
+message sensor_msgs/LaserScan {
+    field header: std_msgs/Header;
+    field angle_min: float32;
+    field angle_max: float32;
+    field angle_increment: float32;
+    field time_increment: float32;
+    field scan_time: float32;
+    field range_min: float32;
+    field range_max: float32;
+    field ranges: float32[];
+    field intensities: float32[];
+}
+
+message sensor_msgs/CameraInfo {
+    field header: std_msgs/Header;
+    field height: uint32;
+    field width: uint32;
+    field distortion_model: string;
+    field D: float64[];
+    field K: float64[9];
+    field R: float64[9];
+    field P: float64[12];
+    field binning_x: uint32;
+    field binning_y: uint32;
+    field roi: sensor_msgs/RegionOfInterest;
+}
+
+message sensor_msgs/SetCameraInfo {
+    request field camera_info: sensor_msgs/CameraInfo;
+    response field success: bool;
+    response field status_message: string;
+}
+
+message sensor_msgs/NavSatFix {
+    field header: std_msgs/Header;
+    field status: sensor_msgs/NavSatStatus;
+    field latitude: float64;
+    field longitude: float64;
+    field altitude: float64;
+    field position_covariance: float64[9];
+    field position_covariance_type: uint8;
+}

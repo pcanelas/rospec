@@ -1,0 +1,12 @@
+node type joint_controller_type {
+    context is_simulation: bool;
+    optional param use_sim_time: bool = false;
+} where {
+    is_simulation -> use_sim_time;
+}
+
+system {
+    node instance joint_controller: joint_controller_type {
+        context is_simulation = true;
+    }
+}

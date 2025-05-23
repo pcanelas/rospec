@@ -1,0 +1,19 @@
+type alias MeterPerSecond: float64;
+type alias RadianPerSecond: float64;
+
+message alias LinearVector3: geometry_msgs/Vector3 {
+    field x: MeterPerSecond;
+    field y: MeterPerSecond;
+    field z: MeterPerSecond;
+}
+
+message alias AngularVector3: geometry_msgs/Vector3 {
+    field x: RadianPerSecond;
+    field y: RadianPerSecond;
+    field z: RadianPerSecond;
+}
+
+message alias AnnotatedTwist: geometry_msgs/Twist {
+    field linear: LinearVector3;
+    field angular: AngularVector3;
+}

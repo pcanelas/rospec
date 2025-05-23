@@ -1,0 +1,20 @@
+node type ekf_localization {
+    optional param twist0: string = "";
+    optional param twist0_config: string[] = [false, false, false,
+                        false, false, false,
+                        true,  true,  true,
+                        false, false, false,
+                        false, false, false];
+} where {
+    exists(twist0_config) -> exists(twist0);
+}
+
+system {
+    node instance ekf_localization_node: ekf_localization {
+        param twist0_config = [false, false, false,
+                               false, false, false,
+                               true, true, false,
+                               false, false, true,
+                               false, false, false];
+    }
+}

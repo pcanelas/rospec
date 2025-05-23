@@ -1,0 +1,11 @@
+message alias AnnotatedMessage: nav_msgs/Odometry {
+    # ...
+    field header: std_msgs/Header;
+    field child_frame_id: string;
+    field pose: geometry_msgs/PoseWithCovariance;
+    field twist: geometry_msgs/TwistWithCovariance;
+}
+
+node type ekf_localization_node_type {
+    broadcast world_frame to base_link;
+}

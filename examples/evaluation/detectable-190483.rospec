@@ -1,0 +1,21 @@
+node type openni_node_type {
+    optional param depth_registration: bool = false;
+
+    publishes to camera/depth/points: sensor_msgs/PointCloud2 where {count(publishers(_)) == 1}; # assuming {depth_registration};
+}
+
+node type amcl_type {
+    optional param depth_registration: bool = false;
+
+    publishes to camera/depth/points: sensor_msgs/PointCloud2 where {count(publishers(_)) == 1}; # assuming {depth_registration};
+}
+
+system {
+    node instance openni_node1: openni_node_type {
+        param depth_registration = true;
+    }
+
+    node instance amcl: amcl_type {
+        param depth_registration = true;
+    }
+}

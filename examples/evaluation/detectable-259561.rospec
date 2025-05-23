@@ -1,0 +1,12 @@
+node type custom_node_1 {
+    publishes to falconPose: geometry_msgs/Pose;
+}
+
+node type custom_node_2 {
+    subscribes to position: geometry_msgs/Pose;
+}
+
+system {
+    node instance custom_node1: custom_node_1 { }
+    node instance custom_node2: custom_node_2 { }
+}

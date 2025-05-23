@@ -1,0 +1,21 @@
+node type rtabmap {
+     optional param publish_tf: bool = false;
+
+     broadcast map to odom; # assuming {publish_tf};
+}
+
+node type robot_localization_type {
+    param map_frame: string;
+    param odom_frame: string;
+
+    broadcast content(map_frame) to content(odom_frame);
+}
+
+system {
+    node instance rtab: rtabmap { }
+
+    node instance  robot_localization: robot_localization_type {
+        param map_frame = "map";
+        param odom_frame = "odom";
+    }
+}

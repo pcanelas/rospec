@@ -1,0 +1,17 @@
+node type amcl_type {
+    consumes service static_map: nav_msgs/GetMap;
+}
+
+node type map_server_type {
+    optional param topic_name: string = "map";
+    provides service content(topic_name): nav_msgs/LoadMap;
+}
+
+system {
+    node instance amcl: amcl_type {
+        # Requires a remap to 30lx
+    }
+    node instance map_server: map_server_type {
+        param topic_name = "30lx";
+    }
+}

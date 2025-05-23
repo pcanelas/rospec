@@ -1,0 +1,16 @@
+node type robot_localization_type {
+     param imu0_config: bool[4][3];
+     param imu0_differential: bool[2][3];
+} where {
+    imu0_config[1][2] == imu0_differential[1][2];
+}
+
+system {
+    node instance robot_localization: robot_localization_type {
+         param imu0_config = [[false, false, false],
+                              [false, false, true],
+                              [false, false, false],
+                              [false, false, false]];
+         param imu0_differential = [[false, false, false], [false, false, false]];
+    }
+}

@@ -1,0 +1,7 @@
+node type stereo_image_proc_type {
+    argument manager: string;
+}
+
+system {
+    node instance stereo_image_proc: stereo_image_proc_type { }
+}

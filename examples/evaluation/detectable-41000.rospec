@@ -1,0 +1,18 @@
+node type amcl_type {
+    optional param odom: string = "odom";
+    optional param map: string = "map";
+
+    broadcast content(odom) to base_link;
+    broadcast content(map) to content(odom);
+}
+
+node type custom_node_type {
+    broadcast odom to odom_error;
+}
+
+system {
+    node instance amcl: amcl_type {
+        param odom = "odom_error";
+    }
+    node instance custom_node: custom_node_type { }
+}

@@ -1,0 +1,1 @@
+Dependency exists(elbow_joint/max_acceleration) -> elbow_joint/has_acceleration_limits not satisfied in move_group

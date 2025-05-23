@@ -1,0 +1,9 @@
+node type hokuyo_node_type {
+    context environment: Enum[ObstacleLayout, EmptyLayout] where {_ == ObstacleLayout};
+}
+
+system{
+    node instance hokuyo_node: hokuyo_node_type {
+        context environment = EmptyLayout;
+    }
+}

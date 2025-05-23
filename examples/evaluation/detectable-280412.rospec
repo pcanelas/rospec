@@ -1,0 +1,22 @@
+node type turtlesim_node_type {
+    subscribes to turtle2/cmd_vel: geometry_msgs/Twist;
+    publishes to turtle2/pose: geometry_msgs/Pose;
+}
+
+node type turtle_tf_broadcast_type {
+    param turtle: string;
+    subscribes to content(turtle): geometry_msgs/Pose;
+    broadcast content(turtle) to world;
+}
+
+node type turtle_tf_listener {
+    publishes to turtle2/cmd_vel: geometry_msgs/Twist;
+    listen turtle2 to turtle1;
+}
+
+system {
+    node instance turtlesim_node: turtlesim_node_type { }
+    node instance turtle1_tf_broadcast: turtle_tf_broadcast_type {
+        param turtle = "turtle1/pose";
+    }
+}

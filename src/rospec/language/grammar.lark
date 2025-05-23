@@ -1,0 +1,164 @@
+start: rospec*                                  -> program
+
+rospec : policy_instance
+       | node_type
+       | node_instance
+       | plugin_type
+       | plugin_instance
+       | message_alias
+       | message_type
+       | type_alias
+       | system
+
+system: "system" "{" rospec* "}"
+
+// Policy specification
+policy_instance: "policy" "instance" expression_name ":" expression_name "{" setting_instance* "}"
+setting_instance: "setting" expression_name "=" expression ";"
+
+// Plugin type/instance specification
+plugin_type: "plugin" "type" expression_name "{" node_type_statement* "}" ("where" "{" (expression ";")+ "}")?
+plugin_instance: "plugin" "instance" expression_name ":" expression_name "{" node_instance_statements* "}"
+
+// Node type specification
+node_type: "node" "type" expression_name "{" node_type_statement* "}" ("where" "{" (expression ";")+ "}")?
+node_type_statement : configurable_type
+                    | connection
+                    | service_action
+                    | frames
+                    | policy_attach
+
+node_instance: "node" "instance" expression_name ":" expression_name "{" node_instance_statements* "}"
+node_instance_statements : configurable_instance
+                   | remapping
+
+// Message alias specification
+message_alias: "message" "alias" ttype ":" ttype "{" fields* "}" ("where" "{" (expression ";")+ "}")?
+message_type: "message" ttype "{" fields* "}" ("where" "{" (expression ";")+ "}")?
+fields: (REQUEST | FEEDBACK | RESPONSE | RESULT)? "field" expression_name ":" ttype ";"
+
+// Type alias specification
+type_alias: "type" "alias" ttype ":" ttype ";"
+
+// Policy attach specification
+policy_attach: "@" expression_name "{" expression_name "}"
+
+// Rules shared between different types of ROS constructs
+configurable_type: OPTIONAL? (ARGUMENT | CONTEXT | PARAMETER) expression_name ":" ttype ("=" expression)? ";"
+configurable_instance: (ARGUMENT | CONTEXT | PARAMETER) expression_name "=" expression ";"
+
+connection: (PUBLISHES_TO | SUBSCRIBES_TO) expression ":" ttype ";"
+service_action: (PROVIDE | CONSUME) (SERVICE | ACTION) expression ":" ttype ";"
+frames: (BROADCAST | LISTEN) expression "to" expression ";"
+remapping: "remaps" expression_name "to" expression_name ";"
+
+
+// Auxiliary Rules
+ttype : ttype ("where" "{" expression "}")                                      -> refined_type
+      | ("Enum" | "OrderedEnum") "[" expression_name ("," expression_name)+ "]"     -> enum_type
+      | BASIC_TTYPE ("[" INT? "]")+                                             -> array_type
+      | BASIC_TTYPE                                                             -> basic_type
+
+
+// Rules for Expressions
+expression : expression_dis                                         -> expr
+           | expression_dis IMPLY expression                        -> boolean_expr
+
+expression_dis : expression_i                                       -> expr
+               | expression_i OR expression_dis                     -> boolean_expr
+
+expression_i : expression_bool AND expression_i                     -> boolean_expr
+             | expression_bool EQUAL expression_i                   -> compare_expr
+             | expression_bool DIFF expression_i                    -> compare_expr
+             | expression_bool                                      -> expr
+
+expression_bool : expression_plus                                   -> expr
+                | NOT expression_bool                               -> not_expr
+                | expression_plus LT expression_bool                -> compare_expr
+                | expression_plus LTE expression_bool               -> compare_expr
+                | expression_plus GT expression_bool                -> compare_expr
+                | expression_plus GTE expression_bool               -> compare_expr
+
+expression_plus : expression_fact                                   -> expr
+                | expression_fact PLUS expression_plus              -> arithmetic_expr
+                | expression_fact MINUS expression_plus             -> arithmetic_expr
+
+expression_fact : expression_un                                     -> expr
+                | expression_un MULT expression_fact                -> arithmetic_expr
+                | expression_un QUOT expression_fact                -> arithmetic_expr
+                | expression_un MODULE expression_fact              -> arithmetic_expr
+
+expression_un : expression_b                                        -> expr
+              | MINUS expression_un                                 -> minus_expr
+
+expression_b : "(" expression ")"                                   -> parens_expr
+             | "[" (expression ("," expression)*)? "]"              -> array_expr
+             | expression_name ("[" expression "]")+                -> access_array_expr
+             | expression_name "{" (expression_name "=" expression ",")* "}" -> msg_fields_expr
+             | (FLOAT | INT | BOOLLIT | ESCAPED_STRING)             -> literal_expr
+             | expression_name                                      -> variable_expr
+             | expression_b "(" expression? ")"                     -> invocation_expr
+
+expression_name : NAME
+
+// Literals
+BOOLLIT.2 : "true" | "false"
+
+CONTEXT : "context"
+ARGUMENT : "argument"
+PARAMETER : "param"
+OPTIONAL : "optional"
+PUBLISHES_TO: "publishes to"
+SUBSCRIBES_TO: "subscribes to"
+BROADCAST: "broadcast"
+LISTEN: "listen"
+SERVICE: "service"
+ACTION: "action"
+REQUEST: "request"
+RESPONSE: "response"
+FEEDBACK: "feedback"
+RESULT: "result"
+PROVIDE: "provides"
+CONSUME: "consumes"
+
+NODE_TYPE: "node type"
+NODE_INSTANCE: "node instance"
+TOPIC_INSTANCE: "topic instance"
+SERVICE_TYPE: "service type"
+SERVICE_INSTANCE: "service instance"
+ACTION_TYPE: "action type"
+ACTION_INSTANCE: "action instance"
+PARAM: "param"
+FIELD: "field"
+
+NAME :  ("0".."9")* ("a".."z" | "A".."Z" | "~" | "/") (/[a-zA-Z0-9_]/* "/"?)+ | "_"
+BASIC_TTYPE: (("A".."Z" | "a".."z" | "0".."9") /[a-zA-Z0-9_\/]/*) | "int" | "bool" | "float"
+
+// Number operations
+PLUS: "+"
+MINUS: "-"
+MULT: "*"
+QUOT.1: "/"
+MODULE: "%"
+
+// Logical Operators
+AND: "and"
+OR: "or"
+NOT: "!"
+
+// Logical Operators
+LT: "<"
+LTE: "<="
+GT: ">"
+GTE: ">="
+EQUAL: "=="
+DIFF: "!="
+IMPLY: "->"
+
+%import common.ESCAPED_STRING
+%import common.WS
+%import common.INT
+%import common.FLOAT
+
+%ignore WS
+%ignore /#[^\n]*/ // Ignore comments starting with #

@@ -1,0 +1,33 @@
+node type laserscan_multi_merger_type {
+    publishes to laserscan_multi_merger/parameter_descriptions: dynamic_reconfigure/ConfigDescription;
+    publishes to laserscan_multi_merger/parameter_updates: dynamic_reconfigure/Config;
+    publishes to merged_cloud: sensor_msgs/PointCloud2;
+    publishes to rosout: rosgraph_msgs/Log;
+    publishes to scan_multi: sensor_msgs/MultiEchoLaserScan;
+}
+
+node type ira_laser_tools_type {
+    optional param destination_frame: string = "cart_frame";
+    optional param cloud_destination_topic: string = "/merged_cloud";
+    optional param scan_destination_topic: string = "scan_multi";
+    optional param laserscan_topics: string[] = ["/scansx", "/scandx"];
+    optional param angle_min: double = -2.0;
+    optional param angle_max: double = 2.0;
+    optional param angle_increment: double = 0.0058;
+    optional param scan_time: double = 0.033333;
+    optional param range_min: double = 0.30;
+    optional param range_max: double = 50.0;
+
+    subscribes to content(laserscan_topics[0]): sensor_msgs/LaserScan;
+    subscribes to content(laserscan_topics[1]): sensor_msgs/LaserScan;
+} where {
+    angle_min < angle_max;
+    range_min < range_max;
+}
+
+system {
+    node instance laserscan_multi_merger:  laserscan_multi_merger_type { }
+    node instance ira_laser_tools: ira_laser_tools_type {
+        param laserscan_topics = ["/sensor_1/points", "/sensor_2/points"];
+    }
+}

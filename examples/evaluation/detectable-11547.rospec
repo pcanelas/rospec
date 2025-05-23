@@ -1,0 +1,28 @@
+type alias Modes: Enum[SXGA15Hz, VGA30Hz, VGA25Hz, QVGA25Hz, QVGA30Hz, QVGA60Hz, QQVGA25Hz, QQVGA30Hz, QQVGA60Hz];
+type alias Second: float;
+
+node type openni_node_type {
+    optional param depth_frame_id: string = "/openni_depth_optical_frame";
+    optional param rgb_frame_id: string = "/openni_rgb_optical_frame";
+    optional param image_mode: Modes = VGA30Hz;
+    optional param depth_mode: Modes = VGA30Hz;
+    optional param use_indices: bool = false;
+    optional param depth_registration: bool = false;
+    optional param depth_time_offset: Second where {_ >= -1 and _ <= 1} = 0.0;
+    optional param image_time_offset: Second where {_ >= -1 and _ <= 1} = 0.0;
+
+    publishes to camera/depth/points: sensor_msgs/PointCloud2 where {count(publishers(_)) == 1}; # assuming {depth_registration};
+}
+
+system {
+    node instance openni_node1: openni_node_type {
+        param depth_registration = true;
+    }
+
+    node instance openni_node2: openni_node_type {
+        param depth_registration = true;
+        param rgb_frame_id = "/openni_rgb_optical_frame_2";
+        param depth_frame_id = "/openni_depth_optical_frame_2";
+    }
+}
+

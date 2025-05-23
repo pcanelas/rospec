@@ -1,0 +1,9 @@
+node type fake_localization_type {
+    context is_simulation: bool where {_ == true};
+}
+
+system {
+    node instance fake_localization: fake_localization_type {
+        context is_simulation = false;
+    }
+}

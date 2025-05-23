@@ -1,0 +1,16 @@
+node type op_motion_simulator_type {
+    context object_avoidance: bool;
+
+    optional param simObjNumber: int = 5;
+    optional param GaussianErrorFactor: int = 0;
+    optional param pointCloudPointsNumber: int = 75;
+    optional param useNavGoalToSetStaticObstacle: bool = true;
+} where {
+    object_avoidance -> !useNavGoalToSetStaticObstacle;
+}
+
+system {
+    node instance op_motion_simulation: op_motion_simulator_type {
+        context object_avoidance = true;
+    }
+}

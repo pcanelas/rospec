@@ -1,0 +1,24 @@
+node type amcl_type {
+    param odom_model_type: Enum[DiffCorrected, OmniCorrected];
+    optional param lazer_z_hit: double = 0.95;
+    optional param odom_alpha1: double = 0.2;
+    optional param odom_alpha2: double = 0.2;
+    optional param odom_alpha3: double = 0.2;
+    optional param odom_alpha4: double = 0.2;
+    optional param odom_alpha5: double = 0.2;
+} where {
+    odom_model_type == OmniCorrected -> exists(odom_alpha5);
+    odom_model_type == DiffCorrected -> odom_alpha1 <= 0.01 and odom_alpha2 <= 0.01 and
+                                        odom_alpha3 <= 0.01  and odom_alpha4 <= 0.01;
+}
+
+system {
+    node instance amcl: amcl_type {
+        param odom_model_type = DiffCorrected;
+        param odom_alpha1 = 4.0;
+        param odom_alpha2 = 0.9;
+        param odom_alpha3 = 0.2;
+        param odom_alpha4 = 0.2;
+        #param odom_alpha5 = 0.2;
+    }
+}

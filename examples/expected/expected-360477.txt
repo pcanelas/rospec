@@ -1,0 +1,2 @@
+Publisher not found for subscriber /sensor_1/points
+Publisher not found for subscriber /sensor_2/points

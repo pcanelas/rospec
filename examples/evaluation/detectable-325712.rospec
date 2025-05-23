@@ -1,0 +1,13 @@
+node type ekf_localization_node_type {
+    broadcast map to odom;
+    broadcast odom to base_link; # Abstracted, these are set in parameters, but in this case the configuration is this one
+}
+
+node type static_transform_publisher {
+    broadcast gps_enu to odom;
+}
+
+system {
+    node instance ekf_localization_node: ekf_localization_node_type { }
+    node instance static_transform: static_transform_publisher { }
+}

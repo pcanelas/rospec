@@ -1,0 +1,1 @@
+Dependency base_frame_name == "odom" -> !(exists(fixed_camera)) not satisfied in rgbdslam

@@ -1,0 +1,10 @@
+type alias Distro: OrderedEnum[Ardent, Bouncy, Crystal, Dashing, Eloquent, Foxy, Galactic, Humble, Iron, Jazzy, Kilted];
+
+type alias Hertz: double;
+
+node type joy_node_type {
+    context distribution: Distro;
+
+    optional param autorepeat_rate: Hertz = 0.0;
+    optional param deadzone: double where {-1.0 <= _ and _ <= 1.0} = 0.05;
+}

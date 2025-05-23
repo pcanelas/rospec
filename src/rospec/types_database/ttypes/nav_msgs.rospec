@@ -1,0 +1,16 @@
+message nav_msgs/GetMap {
+    field map: nav_msgs/OccupancyGrid;
+}
+
+message nav_msgs/LoadMap {
+    request field map_url: string;
+    response field map: nav_msgs/OccupancyGrid;
+    response field result: uint8;
+}
+
+message nav_msgs/Odometry {
+    field header: std_msgs/Header;
+    field child_frame_id: string;
+    field pose: geometry_msgs/PoseWithCovariance;
+    field twist: geometry_msgs/TwistWithCovariance;
+}

@@ -1,0 +1,9 @@
+node type ratslam_ros_type {
+    # ...
+}
+
+
+system {
+    node instance ratslam_ros: ratslam_ros_type { }
+    node instance ratslam_ros: ratslam_ros_type { }
+}

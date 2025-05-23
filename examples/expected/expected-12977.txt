@@ -1,0 +1,1 @@
+Dependency local_costmap/footprint[0, 1] >= local_costmap/min_obstacle_height not satisfied in move_base

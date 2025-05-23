@@ -1,0 +1,1 @@
+Refinement count(publishers(rgbd_image)) == 1 not satisfied in rgbd_image:sensor_msgs/Image where {count(publishers(rgbd_image)) == 1}

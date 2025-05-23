@@ -1,0 +1,14 @@
+node type custom_node_type {
+    broadcast camera_rgb_frame to camera_link;
+}
+
+node type freenect_node_type {
+    optional param publish_tf: bool = true;
+
+    broadcast camera_link to camera_rgb_frame; # assuming {publish_tf};
+}
+
+system {
+    node instance custom_node: custom_node_type { }
+    node instance freenect_node: freenect_node_type { }
+}

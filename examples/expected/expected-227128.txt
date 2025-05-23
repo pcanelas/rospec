@@ -1,0 +1,3 @@
+Broadcast base_footprint -> odom has multiple parents
+Broadcast base_footprint -> odo has multiple parents
+Broadcaster not found for listener base_footprint -> odom

@@ -1,0 +1,28 @@
+message alias RGBImage: sensor_msgs/Image {
+    field height: uint32 where {_ >= 0};
+    field width: uint32 where {_ >= 0};
+
+    field header: std_msgs/Header;
+    field encoding: string;
+    field is_bigendian: uint8;
+    field step: uint32;
+    field data: uint8[];
+}
+
+type alias Natural: int where {_ >= 0};
+
+node type svo_node_type {
+    optional param cam_topic: string = "svo/camera/image_raw";
+    optional param grid_size: double = 30;
+    optional param max_n_kfs: Natural = 10;
+    optional param loba_num_iter: Natural = 0;
+
+    subscribes to content(cam_topic): RGBImage;
+}
+
+# The following is an example of how to use the svo_node_type in a system, it doesn't fully address the question issues.
+# system {
+#    node instance svo: svo_node_type {
+#        param cam_topic = "svo/ardrone/front/image_raw";
+#    }
+# }

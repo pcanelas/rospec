@@ -1,0 +1,13 @@
+node type custom_node {
+    #subscribes to /tilt_controller/command: std_msgs/Float64;
+    broadcast /tilt_laser to laser;
+}
+
+node type rviz_type {
+    listen base_link to map;
+}
+
+system {
+    node instance node: custom_node { }
+    node instance rviz: rviz_type { }
+}

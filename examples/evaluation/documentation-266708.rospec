@@ -1,0 +1,10 @@
+node type image_proc_type {
+    optional param queue_size: int = 5;
+
+    subscribes to image_raw: sensor_msgs/Image;
+    subscribes to camera_info: sensor_msgs/CameraInfo;
+
+    publishes to image_mono: sensor_msgs/Image;
+    publishes to image_rect: sensor_msgs/Image;
+    # ...
+}

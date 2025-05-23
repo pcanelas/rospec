@@ -1,0 +1,2 @@
+Publisher not found for subscriber /kinect2/pointcloud_filtered
+Broadcaster not found for listener kinect2_link -> target_frame

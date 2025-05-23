@@ -1,0 +1,19 @@
+node type rgbd_sync_type {
+    publishes to /rgbd_image: sensor_msgs/Image;
+}
+
+node type zed_wrapper_node_type {
+    publishes to /rgbd_image: sensor_msgs/Image;
+}
+
+node type rtabmap_type {
+    subscribes to rgbd_image: sensor_msgs/Image where {count(publishers(_)) == 1};
+}
+
+system {
+    node instance rgbd_sync: rgbd_sync_type { }
+    node instance zed_wrapper_node: zed_wrapper_node_type { }
+    node instance rtabmap: rtabmap_type {
+        #remaps rgbd_image to /rgbd_image;
+    }
+}

@@ -1,0 +1,14 @@
+node type move_base_t {
+    publishes to cmd_vel: geometry_msgs/Twist;
+}
+
+node type rosaria_node_t {
+    subscribes to /RosAria/cmd_vel: geometry_msgs/Twist;
+}
+
+system {
+    node instance move_base: move_base_t {
+        # remaps cmd_vel to ~cmd_vel;
+    }
+    node instance rosaria_node: rosaria_node_t { }
+}

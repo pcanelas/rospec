@@ -1,0 +1,30 @@
+node type gazebo_type {
+    argument paused: bool;
+    argument use_sim_time: bool;
+    argument gui: bool;
+
+    publishes to /odom: nav2_msgs/Odometry;
+    publishes to tf: tf2_msgs/TFMessage;
+
+    broadcast odom to base_footprint;
+}
+
+node type robot_pose_ekf_type {
+     publishes to tf: tf2_msgs/TFMessage;
+}
+
+node type gmapping_type {
+     subscribes to tf: tf2_msgs/TFMessage where {count(publishers(_)) == 1};
+}
+
+system {
+    node instance gazebo: gazebo_type {
+        argument paused = false;
+        argument use_sim_time = true;
+        argument gui = true;
+    }
+
+    node instance robot_pose_ekf: robot_pose_ekf_type { }
+
+    node instance gmapping: gmapping_type { }
+}

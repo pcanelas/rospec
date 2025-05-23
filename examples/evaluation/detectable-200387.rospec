@@ -1,0 +1,14 @@
+node type obstacle_layer_t {
+    optional param z_voxels: int = 0;
+    optional param observation_sources: Plugin[] = [];
+} where {
+    z_voxels == len(observation_sources);
+}
+
+system {
+    node instance obstacle_layer: obstacle_layer_t {
+        param z_voxels = 2;
+        param observation_sources = [scan, bump, irring_scan];
+    }
+    # ... information about each plugin
+}

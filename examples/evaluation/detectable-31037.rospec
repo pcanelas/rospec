@@ -1,0 +1,13 @@
+node type amcl_type {
+    # I believe these are actually in params, that then we provide and amcl does the broadcast, but I abstracted that here
+    broadcast map to odom;
+}
+
+node type static_transform_publisher {
+    broadcast map to odom;
+}
+
+system {
+    node instance amcl: amcl_type { }
+    node instance map_to_odom: static_transform_publisher { }
+}

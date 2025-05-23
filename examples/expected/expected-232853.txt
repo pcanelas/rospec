@@ -1,0 +1,2 @@
+Node instance move_base is not subtype of Node{cost_scaling_factor: double, inflation_radius: double, robot_radius: double} | Connections:  | Frames:  where Struct{}
+Dependency exists(inflation_radius) == exists(cost_scaling_factor) and robot_radius <= inflation_radius not satisfied in move_base

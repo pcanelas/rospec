@@ -1,0 +1,15 @@
+node type hector_object_tracker_type {
+    optional param distance_to_obstacle_service: string = "get_distance_to_obstacle";
+
+    publishes to visualization_marker: visualization_msgs/Marker;
+    consumes service content(distance_to_obstacle_service): hector_nav_msgs/GetDistanceToObstacle;
+}
+
+node type hector_map_server_type {
+     provides service /hector_map_server/get_distance_to_obstacle: hector_nav_msgs/GetDistanceToObstacle;
+}
+
+system {
+    node instance hector_object_tracker: hector_object_tracker_type { }
+    node instance hector_map_server: hector_map_server_type { }
+}

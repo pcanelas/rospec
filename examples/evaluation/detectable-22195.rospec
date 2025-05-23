@@ -1,0 +1,12 @@
+type alias MeterSecond : float;
+
+node type dwa_local_planner_type {
+    optional param max_vel_x: MeterSecond = 0.55;
+    optional param min_vel_x: MeterSecond = 0.0;
+}
+
+system {
+    node instance dwa_local_planner: dwa_local_planner_type {
+        param penalize_negative_x = true;
+    }
+}

@@ -1,0 +1,19 @@
+node type x {
+    #param y: int;
+    #param y2: float;
+    #param z: bool;
+    param b: geometry_msgs/Twist;
+}
+
+system {
+    node instance x2: x {
+        #param y = "2";
+        #param y2 = "2.0";
+        #param z = "true";
+        # the msg initialization does not respect the type
+        param b = geometry_msgs/Twist {
+            linear = geometry_msgs/Vector3 {x=1.0, y=2.0, z=3.0,},
+            angular = geometry_msgs/Vector3 {x=1.0, y=2, z=3.0,},
+        };
+    }
+}

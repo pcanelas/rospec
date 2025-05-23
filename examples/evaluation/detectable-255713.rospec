@@ -1,0 +1,13 @@
+node type amcl_type {
+    optional param tf_broadcast: bool = false;
+    broadcast map to odom; #assuming {tf_broadcast};
+}
+
+node type ekf_node_type {
+    broadcast map to odom;
+}
+
+system {
+    node instance amcl: amcl_type { }
+    node instance ekf_node: ekf_node_type { }
+}

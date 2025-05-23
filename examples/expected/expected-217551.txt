@@ -1,0 +1,2 @@
+Refinement count(publishers(/mico_arm_driver/in/cartesian_velocity)) == 1 not satisfied in /mico_arm_driver/in/cartesian_velocity:geometry_msgs/TwistStamped where {count(publishers(/mico_arm_driver/in/cartesian_velocity)) == 1}
+Refinement count(publishers(/mico_arm_driver/in/cartesian_velocity)) == 1 not satisfied in /mico_arm_driver/in/cartesian_velocity:geometry_msgs/TwistStamped where {count(publishers(/mico_arm_driver/in/cartesian_velocity)) == 1}

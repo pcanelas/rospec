@@ -1,0 +1,18 @@
+message MoveBaseAction {
+    request field goal: move_base_msgs/MoveBaseGoal;
+    response field result: move_base_msgs/MoveBaseResult;
+    feedback field feedback: move_base_msgs/MoveBaseFeedback;
+}
+
+node type action_server_type {
+    provides service move_base: MoveBaseAction;
+}
+
+node type simple_move_type {
+    consumes service SimpleActionClient: MoveBaseAction;
+}
+
+system {
+    node instance action_server: action_server_type { }
+    node instance simple_move: simple_move_type { }
+}

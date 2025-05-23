@@ -1,0 +1,1 @@
+Dependency exists(topic_image_depth) -> topic_points == "" not satisfied in rgbdslam

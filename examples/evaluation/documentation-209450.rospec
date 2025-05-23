@@ -1,0 +1,32 @@
+type alias ImageEncoding16: Enum[RGB16, RGBA16, BGR16, BGRA16, MONO16,
+                                16UC1, 16UC2, 16UC3, 16UC4, 16SC1, 16SC2, 16SC3, 16SC4,
+                                BAYER_RGGB16, BAYER_BGGR16, BAYER_GBRG16, BAYER_GRBG16
+];
+
+type alias ImageEncoding32: Enum[32SC1, 32SC2, 32SC3, 32SC4, 32FC1, 32FC2, 32FC3, 32FC4];
+
+type alias Meter: uint8;
+type alias Millimeter: uint8;
+
+message alias ImageWith16Encoding: sensor_msgs/Image {
+    field header: std_msgs/Header;
+    field encoding: ImageEncoding16;
+    field data: Millimeter[];
+
+    field height: uint32;
+    field width: uint32;
+    field is_bigendian: uint8;
+    field step: uint32;
+}
+
+
+message alias ImageWith32Encoding: sensor_msgs/Image {
+    field header: std_msgs/Header;
+    field encoding: ImageEncoding32;
+    field data: Meter[];
+
+    field height: uint32;
+    field width: uint32;
+    field is_bigendian: uint8;
+    field step: uint32;
+}

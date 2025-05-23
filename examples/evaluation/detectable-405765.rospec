@@ -1,0 +1,15 @@
+node type custom_node_type {
+    subscribes to /robo/cmd_vel: geometry_msgs/Twist;
+}
+
+# We are not sure what the controller is, but independently of the controller it publishes to cmd_vel, according to the question
+node type nav2_controller_type {
+    publishes to /cmd_vel: geometry_msgs/Twist;
+}
+
+system {
+    node instance custom_node: custom_node_type { }
+    node instance nav2_controller: nav2_controller_type {
+        # missing: remaps /cmd_vel to /robo/cmd_vel;
+    }
+}

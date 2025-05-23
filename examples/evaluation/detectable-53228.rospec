@@ -1,0 +1,20 @@
+node type rgbdslam_type {
+    optional param individual_cloud_out_topic: string = "topic_points";
+    optional param store_pointclouds: bool = true;
+
+    publishes to content(individual_cloud_out_topic): sensor_msgs/PointCloud2; # assuming {store_pointclouds};
+}
+
+node type custom_node_type {
+    # This is used to mimic the attempt to access the information from this topic
+    subscribes to /rgbdslam/batch_clouds: sensor_msgs/PointCloud2;
+}
+
+system {
+    node instance rgbdslam: rgbdslam_type {
+        #param individual_cloud_out_topic = "/rgbdslam/batch_clouds";
+        param store_pointclouds = false;
+    }
+
+    node instance custom_node: custom_node_type { }
+}

@@ -1,0 +1,30 @@
+message alias RestrictedPointCloud2: sensor_msgs/PointCloud2 {
+    field data: uint8[];
+    field header: std_msgs/Header;
+    field height: uint32;
+    field width: uint32;
+    field fields: sensor_msgs/PointField[];
+    field is_bigendian: bool;
+    field point_step: uint32;
+    field row_step: uint32;
+    field is_dense: bool;
+} where {
+    data[0] < data[len(data) - 1];
+}
+
+node type laser_scan_matcher_type {
+    optional param use_cloud_input: bool = false;
+    optional param cloud_range_min: double = 0.1;
+    optional param cloud_range_max: double = 50.0;
+
+    subscribes to scan: sensor_msgs/LaserScan;
+    subscribes to cloud: RestrictedPointCloud2;
+    subscribes to imu_data: sensor_msgs/Imu;
+    subscribes to odom: nav_msgs/Odometry;
+
+    listen base_link to laser;
+    broadcast world to base_link;
+} where {
+    !use_cloud_input -> !exists(cloud_range_min);
+    !use_cloud_input -> !exists(cloud_range_max);
+}

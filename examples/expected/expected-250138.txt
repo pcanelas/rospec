@@ -1,0 +1,1 @@
+ Dependency exists(orientation_mode) -> global_plan_overwrite_orientation not satisfied in teb_local_planner

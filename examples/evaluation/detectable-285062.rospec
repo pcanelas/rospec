@@ -1,0 +1,13 @@
+node type map_server_type {
+    optional param frame_id: string = "map";
+    optional param use_map_topic: bool = false;
+} where {
+    exists(frame_id) -> use_map_topic;
+}
+
+system {
+    node instance map_server: map_server_type {
+        param frame_id = "/map";
+        param use_map_topic = false;
+    }
+}

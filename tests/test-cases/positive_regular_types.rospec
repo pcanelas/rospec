@@ -1,0 +1,13 @@
+node type x {
+    param y: int;
+    param y2: float;
+    param z: bool;
+}
+
+system {
+    node instance x2: x {
+        param y = 2;
+        param y2 = 2.0;
+        param z = true;
+    }
+}

@@ -1,0 +1,7 @@
+node type camera_calibration_type {
+    consumes service /camera/set_camera_info: sensor_msgs/SetCameraInfo;
+}
+
+system {
+    node instance camera_calibration: camera_calibration_type { }
+}

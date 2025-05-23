@@ -1,0 +1,20 @@
+node type move_group_type {
+    param elbow_joint/max_acceleration: double where {_ >= 0};
+    #param elbow_joint/min_velocity: double;
+    optional param elbow_joint/max_velocity: double = 2.0;
+    #param angle_wraparound: bool;
+
+    optional param elbow_joint/has_velocity_limits: bool = false;
+    optional param elbow_joint/has_acceleration_limits: bool = false;
+} where {
+     exists(elbow_joint/max_acceleration) -> elbow_joint/has_acceleration_limits;
+}
+
+system {
+    node instance move_group: move_group_type {
+        param elbow_joint/max_acceleration = 0;
+        param elbow_joint/max_velocity = 3.14;
+        param elbow_joint/has_acceleration_limits = false;
+        param elbow_joint/has_velocity_limits = false;
+    }
+}

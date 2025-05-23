@@ -1,0 +1,1 @@
+Node instance hokuyo_node is not subtype of Node{environment: environment:Enum[ObstacleLayout, EmptyLayout] where {environment == ObstacleLayout}} | Connections:  | Frames:  where Struct{environment: environment:string where {environment == "EmptyLayout"}}

@@ -1,0 +1,14 @@
+message dynamic_reconfigure/ConfigDescription {
+    field groups: dynamic_reconfigure/Group[];
+    field max: dynamic_reconfigure/Config;
+    field min: dynamic_reconfigure/Config;
+    field dflt: dynamic_reconfigure/Config;
+}
+
+message dynamic_reconfigure/Config {
+    field bools: dynamic_reconfigure/BoolParameter[];
+    field ints: dynamic_reconfigure/IntParameter[];
+    field doubles: dynamic_reconfigure/DoubleParameter[];
+    field strs: dynamic_reconfigure/StrParameter[];
+    field groups: dynamic_reconfigure/GroupState[];
+}

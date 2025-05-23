@@ -1,0 +1,17 @@
+message visualization_msgs/Marker {
+    field header: std_msgs/Header;
+    field ns: string;
+    field id: int32;
+    field type: int32;
+    field action: int32;
+    field pose: geometry_msgs/Pose;
+    field scale: geometry_msgs/Vector3;
+    field color: std_msgs/ColorRGBA;
+    field lifetime: duration;
+    field frame_locked: bool;
+    field points: geometry_msgs/Point[];
+    field colors: std_msgs/ColorRGBA[];
+    field text: string;
+    field mesh_resource: string;
+    field mesh_use_embedded_materials: bool;
+}

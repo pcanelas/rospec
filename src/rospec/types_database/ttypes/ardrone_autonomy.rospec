@@ -1,0 +1,6 @@
+message ardrone_autonomy/navdata_pressure_raw {
+    field header: std_msgs/Header;
+    field altitude: float;
+    field pressure: float;
+    field temperature: float;
+}

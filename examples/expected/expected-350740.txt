@@ -1,0 +1,1 @@
+Dependency version >= V221 -> yaw_orientation == East -> yaw_offset == 0 and version >= V221 -> yaw_orientation != East -> yaw_offset != 0 and version <= V221 -> yaw_orientation == North -> yaw_offset == 0 and version <= V221 -> yaw_orientation != North -> yaw_offset != 0 not satisfied in navsat_transform_node

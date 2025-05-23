@@ -1,0 +1,29 @@
+node type kinect2_bridge_type {
+    publishes to /kinect2/sd/image_depth_rect: sensor_msgs/Image;
+    publishes to /kinect2/sd/camera_info: sensor_msgs/CameraInfo;
+
+    broadcast kinect2_ir_optical_frame to kinect2_link;
+}
+
+node type depth_to_pointcloud_type {
+    subscribes to /kinect2/sd/image_depth_rect: sensor_msgs/Image;
+    subscribes to /kinect2/sd/camera_info: sensor_msgs/CameraInfo;
+    publishes to /kinect2/pointcloud: sensor_msgs/PointCloud2;
+}
+
+node type kinect2_filtering_type {
+    subscribes to /kinect2/pointcloud: sensor_msgs/PointCloud2;
+    publishes to /kinect2/pointcloud_filtered: sensor_msgs/PointCloud2;
+}
+
+node type pointcloud_to_laserscan_type {
+    subscribes to /kinect2/pointcloud_filtered: sensor_msgs/PointCloud2;
+    publishes to /scan2: sensor_msgs/LaserScan;
+    listen target_frame to kinect2_link;
+}
+
+system {
+    node instance kinect2_bridge : kinect2_bridge_type { }
+    node instance  depth_to_pointcloud: depth_to_pointcloud_type { }
+    node instance  pointcloud_to_laserscan: pointcloud_to_laserscan_type { }
+}

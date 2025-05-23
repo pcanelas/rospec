@@ -1,0 +1,12 @@
+node type joint_state_publisher_type {
+    publishes to joint_states: sensor_msgs/JointState where {count(publishers(_)) == 1};
+}
+
+node type custom_node_type {
+    publishes to joint_states: sensor_msgs/JointState where {count(publishers(_)) == 1};
+}
+
+system{
+    node instance joint_state_publisher: joint_state_publisher_type {}
+    node instance custom_node: custom_node_type {}
+}

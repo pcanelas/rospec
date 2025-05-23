@@ -1,0 +1,14 @@
+node type laser_scan_matcher_node_type {
+    optional context is_simulation: bool = false;
+    optional param use_sim_time: bool = false;
+} where {
+    is_simulation -> use_sim_time;
+}
+
+
+system {
+    node instance laser_scan_matcher_node: laser_scan_matcher_node_type {
+        context is_simulation = true;
+        param use_sim_time = false;
+    }
+}

@@ -1,0 +1,9 @@
+message move_base_msgs/MoveBaseFeedback {
+    field base_position: geometry_msgs/PoseStamped;
+}
+
+message move_base_msgs/MoveBaseGoal {
+    field target_pose: geometry_msgs/PoseStamped;
+}
+
+message move_base_msgs/MoveBaseResult { }

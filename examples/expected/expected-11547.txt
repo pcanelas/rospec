@@ -1,0 +1,2 @@
+Refinement count(publishers(camera/depth/points)) == 1 not satisfied in camera/depth/points:sensor_msgs/PointCloud2 where {count(publishers(camera/depth/points)) == 1}
+Refinement count(publishers(camera/depth/points)) == 1 not satisfied in camera/depth/points:sensor_msgs/PointCloud2 where {count(publishers(camera/depth/points)) == 1}

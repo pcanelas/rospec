@@ -1,0 +1,44 @@
+node type amcl_type {
+    optional param set_initial_pose: bool = false;
+    optional param always_reset_initial_pose: bool = false;
+
+    optional param initial_pose: geometry_msgs/Pose = geometry_msgs/Pose {
+        position = geometry_msgs/Point {
+            x = 0.0,
+            y = 0.0,
+            theta = 0.0,
+        },
+        orientation = geometry_msgs/Quaternion {
+            x = 0.0,
+            y = 0.0,
+            z = 0.0,
+            w = 0.0,
+        },
+    };
+
+    subscribes to initialpose: geometry_msgs/PoseWithCovarianceStamped;
+} where {
+    exists(initial_pose) -> set_initial_pose;
+    exists(initial_pose) and set_initial_pose -> always_reset_initial_pose;
+}
+
+system {
+    node instance amcl: amcl_type {
+        param set_initial_pose = false;
+        param always_reset_initial_pose = false;
+        # Placeholder parameters here, no longer available on Github
+        param initial_pose = geometry_msgs/Pose {
+            position = geometry_msgs/Point {
+                x = 1.0,
+                y = 1.0,
+                z = 1.0,
+            },
+            orientation = geometry_msgs/Quaternion {
+                x = 1.0,
+                y = 1.0,
+                z = 1.0,
+                w = 1.0,
+            },
+        };
+    }
+}

@@ -1,0 +1,7 @@
+message hector_nav_msgs/GetDistanceToObstacle {
+    field header: std_msgs/Header;
+    field angle_min: float;
+    field angle_max: float;
+    field angle_increment: float;
+    field ranges: float[];
+}

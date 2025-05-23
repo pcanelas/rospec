@@ -1,0 +1,15 @@
+type alias Meter: double;
+
+node type move_base_type {
+    param local_costmap/min_obstacle_height: Meter;
+    param local_costmap/footprint: double[4][2];
+} where {
+    local_costmap/footprint[0][1] >= local_costmap/min_obstacle_height;
+}
+
+system {
+    node instance move_base: move_base_type {
+        param local_costmap/min_obstacle_height = 0.10;
+        param local_costmap/footprint = [[-0.4, -0.4], [-0.4, 0.4], [0.4, 0.4], [0.4, 0.4]];
+    }
+}

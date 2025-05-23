@@ -1,0 +1,9 @@
+message rosgraph_msgs/Log {
+    field level: int;
+    field name: string;
+    field msg: string;
+    field file: string;
+    field function: string;
+    field line: int;
+    field topics: string[];
+}

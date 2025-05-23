@@ -1,0 +1,19 @@
+node type rgbdslam_type {
+    optional param topic_image_mono: string = "/camera/rgb/image_color";
+    optional param camera_info_topic: string = "/camera/rgb/camera_info";
+    optional param topic_image_depth: string = "/camera/depth_registered/sw_registered/image_rect_raw";
+    optional param topic_points: string = "";
+    optional param base_frame_name: string = "/openni_rgb_optical_frame";
+} where {
+    exists(topic_image_depth) -> topic_points == "";
+}
+
+system {
+    node instance rgbdslam: rgbdslam_type {
+        param topic_image_mono = "/camera/color/image_raw";
+        param camera_info_topic = "/camera/depth/image_raw";
+        param topic_image_depth = "/camera/depth/points";
+        param topic_points = "/camera_link";
+        param base_frame_name = "/camera_link";
+    }
+}

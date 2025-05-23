@@ -1,0 +1,7 @@
+type alias Distro: OrderedEnum[DiamondBlack, Electrict, Fuerte, Groovy, Hydro, Indigo, Jade, Kinetic, Lunar, Melodic, Noetic];
+
+node type move_base_type {
+    optional context distribution: Distro = Hydro;
+
+    optional param GlobalPlanner/use_dijkstra: bool = false;
+}

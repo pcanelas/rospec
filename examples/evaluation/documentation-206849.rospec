@@ -1,0 +1,4 @@
+node type ardrone_autonomy_type {
+    optional param enable_navdata_pressure_raw: bool = false;
+    publishes to enable_navdata_pressure_raw: ardrone_autonomy/navdata_pressure_raw; # assuming {enable_navdata_pressure_raw};
+}

@@ -1,0 +1,16 @@
+type alias Rate: int where {_ > 0};
+
+node type sicklms {
+    context device_resolution: double;
+
+    optional param use_rep_117: bool = true;
+    optional param port: string = "dev/lms200";
+    optional param baud: Rate = 38400;
+    optional param inverted: bool = false;
+    optional param frame_id: string = "laser";
+    optional param angle: int = 0;
+    optional param resolution: double = 0.0;
+    optional param connect_delay: double = 0.0;
+
+    publishes to scan: sensor_msgs/LaserScan;
+}

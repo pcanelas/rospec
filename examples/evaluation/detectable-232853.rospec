@@ -1,0 +1,12 @@
+node type move_base_type {
+    param cost_scaling_factor: double;
+    param inflation_radius: double;
+    param robot_radius: double;
+} where {
+    exists(inflation_radius) == exists(cost_scaling_factor);
+    robot_radius <= inflation_radius;
+}
+
+system {
+    node instance move_base:  move_base_type { }
+}

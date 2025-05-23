@@ -1,0 +1,6 @@
+node type amcl_type {
+    context number_of_robots: int;
+    optional param tf_prefix: string = "";
+} where {
+    number_of_robots > 1 == exists(tf_prefix);
+}

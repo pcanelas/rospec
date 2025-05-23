@@ -1,0 +1,13 @@
+# turtlesim/Velocity was replaced with geometry_msgs/Twist
+type alias RadSeconds : float;
+
+message alias AnnotatedVector3: geometry_msgs/Vector3 {
+    field x: RadSeconds;
+    field y: RadSeconds;
+    field z: RadSeconds;
+}
+
+message alias UnitsVelocity: geometry_msgs/Twist {
+    field linear: AnnotatedVector3;
+    field angular: AnnotatedVector3;
+}

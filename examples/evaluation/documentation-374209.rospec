@@ -1,0 +1,3 @@
+node type component_manager_type {
+    optional argument use_intra_process_comms: bool = false;
+}

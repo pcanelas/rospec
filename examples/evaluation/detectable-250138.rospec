@@ -1,0 +1,12 @@
+plugin type teb_local_planner_t {
+    optional param orientation_mode: int = 1;
+    optional param global_plan_overwrite_orientation: bool = false;
+} where {
+    exists(orientation_mode) -> global_plan_overwrite_orientation;
+}
+
+system {
+    plugin instance teb_local_planner: teb_local_planner_t {
+        param orientation_mode = 2;
+    }
+}

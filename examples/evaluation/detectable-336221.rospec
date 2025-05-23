@@ -1,0 +1,22 @@
+node type move_base_type {
+    publishes to initialpose: geometry_msgs/PoseWithCovarianceStamped;
+}
+
+node type new_amcl_type {
+    # argument model: Enum[Burger, Waffle, WafflePi];
+    # argument move_forward_only: bool = false;
+
+    subscribes to initialpose_dqn: geometry_msgs/PoseWithCovarianceStamped;
+}
+
+system {
+    node instance move_base: move_base_type {
+        #publishes to initialpose: geometry_msgs/PoseWithCovarianceStamped;
+    }
+
+    node instance amcl: new_amcl_type {
+        # argument model: Enum[Burger, Waffle, WafflePi];
+        # argument move_forward_only: bool = false;
+        #subscribes to initialpose_dqn: geometry_msgs/PoseWithCovarianceStamped;
+    }
+}

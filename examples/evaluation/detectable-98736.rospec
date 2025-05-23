@@ -1,0 +1,13 @@
+node type amcl_type {
+    broadcast map to odom;
+    broadcast odom to base_link; # Abstracted, these come from parameters and are not hardcoded
+}
+
+node type static_transform_publisher_type {
+    broadcast map to odom;
+}
+
+system {
+    node instance amcl: amcl_type { }
+    node instance map_to_odom: static_transform_publisher_type { }
+}

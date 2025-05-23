@@ -1,0 +1,16 @@
+node type x {
+    param y: int where {_ > 0};
+    param x: int where {_ > 0};
+    optional param z: geometry_msgs/Vector3 = geometry_msgs/Vector3 {
+        x = 1,
+        y = 2,
+        z = 3,
+    };
+}
+
+system {
+    node instance x2: x {
+        param y = 2;
+        param x = content(y) + 1;
+    }
+}

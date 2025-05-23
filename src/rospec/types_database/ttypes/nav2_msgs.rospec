@@ -1,0 +1,16 @@
+message nav2_msgs/Odometry {
+    field header: std_msgs/Header;
+    field child_frame_id: string;
+    field pose: geometry_msgs/PoseWithCovariance;
+    field twist: geometry_msgs/TwistWithCovariance;
+}
+
+message nav2_msgs/NavSatFix {
+    field header: std_msgs/Header;
+    field status: sensor_msgs/NavSatStatus;
+    field latitude: float64;
+    field longitude: float64;
+    field altitude: float64;
+    field position_covariance: float64[9];
+    field position_covariance_type: Enum[Unknown, Approximated, DiagonalKnown, Known];
+}

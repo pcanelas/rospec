@@ -1,0 +1,35 @@
+node type local_costmap_t {
+    param global_frame: string;
+    param robot_base_frame: string;
+
+    broadcast content(global_frame) to content(robot_base_frame);
+}
+
+node type global_costmap_t {
+    param global_frame: string;
+    param robot_base_frame: string;
+
+    broadcast content(global_frame) to content(robot_base_frame);
+}
+
+node type amcl_type {
+    param base_frame_id: string;
+    param global_frame_id: string;
+}
+
+system {
+    node instance local_costmap: local_costmap_t {
+        param global_frame = "odom";
+        param robot_base_frame = "base_link";
+    }
+
+    node instance global_costmap: global_costmap_t {
+        param global_frame = "/map";
+        param robot_base_frame = "base_link";
+    }
+
+    node instance amcl: amcl_type {
+        param base_frame_id = "base_link";
+        param global_frame_id = "/map";
+    }
+}

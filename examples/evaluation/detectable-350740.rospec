@@ -1,0 +1,19 @@
+node type navsat_transform_node_type {
+    context version: OrderedEnum[V2, V221, V223];
+    context yaw_orientation: Enum[North, East, West, South];
+
+    param yaw_offset: double;
+} where {
+    (version >= V221) -> (yaw_orientation == East -> yaw_offset == 0);
+    (version >= V221) -> (yaw_orientation != East -> yaw_offset != 0);
+    (version <= V221) -> (yaw_orientation == North -> yaw_offset == 0);
+    (version <= V221) -> (yaw_orientation != North -> yaw_offset != 0);
+}
+
+system {
+    node instance navsat_transform_node: navsat_transform_node_type {
+        context version = V221;
+        context yaw_orientation = East;
+        param yaw_offset = 3.14159265359;
+    }
+}

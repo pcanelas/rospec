@@ -1,0 +1,1 @@
+Node instance fake_localization is not subtype of Node{is_simulation: is_simulation:bool where {is_simulation == True}} | Connections:  | Frames:  where Struct{is_simulation: is_simulation:bool where {is_simulation == False}}

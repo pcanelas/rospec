@@ -1,0 +1,1 @@
+Configurable information penalize_negative_x not found in dwa_local_planner_type

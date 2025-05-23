@@ -1,0 +1,1 @@
+Dependency exists(frame_id) -> use_map_topic not satisfied in map_server

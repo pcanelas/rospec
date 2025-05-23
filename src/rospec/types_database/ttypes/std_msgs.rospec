@@ -1,0 +1,9 @@
+message std_msgs/Header {
+    field seq: uint32;
+    field stamp: builtin_interfaces/Time;
+    field frame_id: string;
+}
+
+message std_msgs/Float64 {
+    field data: float64;
+}
