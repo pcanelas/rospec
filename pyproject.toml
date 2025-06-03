@@ -1,6 +1,6 @@
 [project]
 name = "rospec"
-version = "0.0.1"
+version = "0.0.2"
 description = "Specification and verification of ROS-based robot software"
 authors = [
     {name = "Paulo Canelas", email = "pasantos@andrew.cmu.edu"},
