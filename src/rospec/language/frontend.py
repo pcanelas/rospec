@@ -353,7 +353,7 @@ class TreeToROSpec(Interpreter):
         return args[0]
 
     @visit_children_decor
-    def parens_exr(self, args):
+    def parens_expr(self, args):
         return args[0]
 
     @visit_children_decor
