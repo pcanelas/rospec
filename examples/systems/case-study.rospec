@@ -44,20 +44,22 @@ policy instance sensor_data_profile : qos {
 type alias AfterHumbleVersion: OrderedEnum[Ardent, Bouncy, Crystal, Dashing, Eloquent, Foxy, Galactic, Humble, Iron, Jazzy, Kilted] where {_ >= Humble};
 type alias BeforeJazzyVersion: OrderedEnum[Ardent, Bouncy, Crystal, Dashing, Eloquent, Foxy, Galactic, Humble, Iron, Jazzy, Kilted] where {_ <= Jazzy};
 
-type alias Natural : double where {_ >= 0};
+type alias Natural : float32 where {_ >= 0};
 type alias Nanosecond : Natural;
 type alias Second : Natural;
 type alias Radian : float32;
-type alias Meter : float32;
+type alias Meter32 : float32;
+type alias Meter: float;
 
 message alias RestrictedLaserScan : sensor_msgs/LaserScan {
+    field header: std_msgs/Header;
 	field angle_min : Radian;
     field angle_max : Radian;
     field angle_increment : Radian;
     field time_increment : Second;
     field scan_time : Natural;
-    field range_min : Meter;
-    field range_max : Meter;
+    field range_min : Meter32;
+    field range_max : Meter32;
     field ranges : float32[];
     field intensities : float32[];
 } where {
@@ -148,8 +150,8 @@ node type amcl_type {
 } where {
 	laser_min_range <= laser_max_range;
     min_particles <= max_particles;
-    laser_mode_ltype == Beam -> z_hit + z_max + z_rand + z_short == 1;
-    laser_mode_ltype == LikelihoodField -> z_hit + z_rand == 1;
+    laser_model_type == Beam -> z_hit + z_max + z_rand + z_short == 1;
+    laser_model_type == LikelihoodField -> z_hit + z_rand == 1;
 	always_reset_initial_pose -> exists(initial_pose) and set_initial_pose;
     set_initial_pose -> exists(initial_pose);
 }
@@ -186,7 +188,7 @@ node type controller_server_kilted {
 
     provides action follow_path: nav2_msgs/FollowPath;
 } where {
-	min_y_velocity_threshold < min_x_velocity_threshold;
+	min_y_velocity_threshold <= min_x_velocity_threshold;
 }
 
 plugin type FollowPath {
@@ -207,14 +209,14 @@ type alias RadianSecond: float;
 
 # Critics
 plugin type RotateToGoal {
-	optional param xy_goal_tolerance : Meter = 0.25;
+	optional param xy_goal_tolerance : Meter32 = 0.25;
     optional param trans_stopped_velocity : RadianSecond = 0.25;
     optional param slowing_factor : double = -1;
     optional param scale: double = 1.0;
 }
 
 plugin type Oscillation {
-	optional param oscillation_reset_dist : Meter = 0.05;
+	optional param oscillation_reset_dist : Meter32 = 0.05;
     optional param oscillation_reset_angle : Radian = 0.2;
     optional param oscillation_reset_time : Second = -1;
     optional param x_only_threshold : double = 0.05;
@@ -427,13 +429,12 @@ system {
         param map_topic = "map";
         param max_particles = 8000;
         param min_particles = 200;
-        param set_initial_pose = true;
     }
 
     node instance controller_server : controller_server_kilted {
         context distribution = Humble;
 
-        param odom_string = odom;
+        param odom_topic = odom;
 
         param controller_frequency = 5.0;
         param min_theta_velocity_threshold = 0.001;
