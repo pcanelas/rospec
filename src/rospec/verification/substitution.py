@@ -45,17 +45,37 @@ def substitute_connection_with_assignments(context, connection: Connection, s: s
 
     # It is a Publisher, Subscriber, Service or Action
     if isinstance(connection, (Publisher, Subscriber, Service, Action)):
+        previous_topic = connection.topic
         connection.topic = inverse_substitution_expr_expr(s, value, connection.topic)
 
-        if isinstance(connection.topic, FunctionCall):
+        if isinstance(connection.topic, FunctionCall) and previous_topic != connection.topic:
             assert connection.topic.operator.name == "content", "For now the only function call allowed is content()"
             assert len(connection.topic.operands) == 1, "content() must have one operand"
-            connection.topic = Identifier(
-                name=interpret(context, connection.topic.operands[0]), ttype=connection.topic.ttype
-            )
+
+            name: str = interpret(context, connection.topic.operands[0])
+            connection.topic = Identifier(name=name, ttype=connection.topic.ttype)
+            ttype = connection.topic.ttype
+            if isinstance(ttype, RefinedType):
+                ttype = RefinedType(
+                    name=ttype.name,
+                    ttype=ttype.ttype,
+                    refinement=substitute_contents_in_expr(s, Identifier(name=name, ttype=t_bottom), ttype.refinement))
+
+            connection.topic = Identifier(name=name, ttype=ttype)
 
     return connection
 
+def substitute_contents_in_expr(s: str, value: Expression, expr: Expression) -> Expression:
+
+    if isinstance(expr, FunctionCall):
+        # The way we call it right now, we always ensure that the operand is what we intend to replace
+        if expr.operator.name == "content":
+            return value
+        else:
+            new_operands = [substitute_contents_in_expr(s, value, operand) for operand in expr.operands]
+            return FunctionCall(operator=expr.operator, operands=new_operands, ttype=expr.ttype)
+
+    return expr
 
 def substitute_connection_with_remaps(connection: Connection, old: str, new: str):
     if isinstance(connection, TFTransform):

@@ -54,7 +54,7 @@ evaluation_context = {
         if y.role == ServiceActionRole.CONSUMES
     ],
     "exists": lambda ctx, x: (not isinstance(ctx.typing[x.name], OptionalType)) and x.name in ctx.values,
-    # TODO: default(plugin_name):
+    "default": lambda ctx, x: True, # TODO: default(plugin_name):
 }
 
 

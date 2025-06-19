@@ -68,4 +68,4 @@ def ty_formation(context: Context, ttype: TType):
     elif isinstance(ttype, AbstractionType):
         type_abstraction(context, ttype)
     else:
-        assert False, f"Type {ttype} ({type(ttype)})not found in context"
+        assert False, f"Type {ttype} ({type(ttype)}) not found in context"

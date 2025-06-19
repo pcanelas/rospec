@@ -75,8 +75,8 @@ node type amcl_type {
     context distribution : AfterHumbleVersion;
 
     param robot_model_type: Enum[DifferentialMotionModel, OmniMotionModel];
-	param scan_topic: Topic;
-    param map_topic: Topic;
+	param scan_topic: string;
+    param map_topic: string;
 
 	optional param alpha1: double = 0.2;
 	optional param alpha2: double = 0.2;
@@ -124,14 +124,14 @@ node type amcl_type {
     optional param first_map_only: string = false;
     optional param bond_heartbeat_period: double = 0.1;
 
+    @qos{sensor_data_profile}
+    subscribes to content(scan_topic) : RestrictedLaserScan where {count(publishers(_)) > 0};
+
     @qos{sensor_data}
     publishes to particle_cloud: nav2_msgs/ParticleCloud;
 
     @qos{transient_reliable_qos}
     publishes to amcl_pose: geometry_msgs/PoseWithCovarianceStamped;
-
-    @qos{sensor_data_profile}
-    subscribes to content(scan_topic) : RestrictedLaserScan where {count(publishers(content(_))) > 0};
 
     @qos{system_default_qos}
     subscribes to initialpose : geometry_msgs/PoseWithCovarianceStamped where {count(publishers(_)) == 1};
@@ -423,8 +423,8 @@ system {
         context distribution = Humble;
 
         param robot_model_type = DifferentialMotionModel;
-        param scan_string = scan;
-        param map_string = map;
+        param scan_topic = "scan";
+        param map_topic = "map";
         param max_particles = 8000;
         param min_particles = 200;
         param set_initial_pose = true;

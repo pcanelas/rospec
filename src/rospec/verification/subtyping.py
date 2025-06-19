@@ -24,7 +24,6 @@ from rospec.verification.substitution import inverse_substitution_expr_expr
 def is_subtype_refined(context: Context, t: TType, u: TType) -> bool:
     if isinstance(t, RefinedType) and isinstance(u, RefinedType):
         # TODO: for now lets have the assumption that the left hand side is always ==
-        print(f"Checking if {t} is subtype of {u}")
         if not (isinstance(t.refinement, rospec_nodes.FunctionCall) and t.refinement.operator.name == "=="):
             return True
 
