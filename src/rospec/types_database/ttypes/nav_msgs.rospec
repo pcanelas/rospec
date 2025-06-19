@@ -14,3 +14,14 @@ message nav_msgs/Odometry {
     field pose: geometry_msgs/PoseWithCovariance;
     field twist: geometry_msgs/TwistWithCovariance;
 }
+
+message nav_msgs/OccupancyGrid {
+    field header: std_msgs/Header;
+    field info: nav_msgs/MapMetaData;
+    field data: int8[];
+}
+
+message nav_msgs/Path {
+    field header: std_msgs/Header;
+    field poses: geometry_msgs/PoseStamped[];
+}
