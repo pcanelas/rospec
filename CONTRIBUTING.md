@@ -65,43 +65,12 @@ uv run ruff check
 uv run ruff check --fix
 ```
 
-## Making Changes
-
 ### Branch Naming
 
 Use descriptive branch names:
 - `feature/add-new-parser` for new features
 - `fix/parameter-validation` for bug fixes
 - `docs/update-readme` for documentation changes
-
-### Commit Messages
-
-Write clear, descriptive commit messages:
-- Use the imperative mood ("Add feature" not "Added feature")
-- Keep the first line under 50 characters
-- Provide more detail in the body if necessary
-
-Example:
-```
-Add support for service specifications
-
-- Implement service type parsing
-- Add validation for service connections
-- Update grammar to include service definitions
-```
-
-### Pull Requests
-
-1. **Create a new branch** from `main`
-2. **Make your changes** following the coding standards
-3. **Add tests** for new functionality
-4. **Update documentation** if necessary
-5. **Ensure all tests pass** and pre-commit hooks succeed
-6. **Submit a pull request** with a clear description of your changes
-
-## Code of Conduct
-
-Please be respectful and professional in all interactions. We aim to create an inclusive and welcoming environment for all contributors.
 
 ## License
 
