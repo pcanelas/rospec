@@ -59,14 +59,15 @@ def substitute_connection_with_assignments(context, connection: Connection, s: s
                 ttype = RefinedType(
                     name=ttype.name,
                     ttype=ttype.ttype,
-                    refinement=substitute_contents_in_expr(s, Identifier(name=name, ttype=t_bottom), ttype.refinement))
+                    refinement=substitute_contents_in_expr(s, Identifier(name=name, ttype=t_bottom), ttype.refinement),
+                )
 
             connection.topic = Identifier(name=name, ttype=ttype)
 
     return connection
 
-def substitute_contents_in_expr(s: str, value: Expression, expr: Expression) -> Expression:
 
+def substitute_contents_in_expr(s: str, value: Expression, expr: Expression) -> Expression:
     if isinstance(expr, FunctionCall):
         # The way we call it right now, we always ensure that the operand is what we intend to replace
         if expr.operator.name == "content":
@@ -76,6 +77,7 @@ def substitute_contents_in_expr(s: str, value: Expression, expr: Expression) -> 
             return FunctionCall(operator=expr.operator, operands=new_operands, ttype=expr.ttype)
 
     return expr
+
 
 def substitute_connection_with_remaps(connection: Connection, old: str, new: str):
     if isinstance(connection, TFTransform):

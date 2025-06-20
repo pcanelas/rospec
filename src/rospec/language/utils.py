@@ -13,6 +13,7 @@ from rospec.language.nodes import (
     Service,
     ConfigurableInformation,
     Remapping,
+    Program,
 )
 from rospec.language.ttypes import (
     t_bool,

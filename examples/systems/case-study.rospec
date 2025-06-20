@@ -37,7 +37,7 @@ policy instance sensor_data_profile : qos {
     setting durability  = Volatile;
     setting deadline = 0;
     setting lifespan = 0;
-    setting liveliness = Automatic; # TODO: https://docs.ros2.org/foxy/api/rmw/types_8h.html#a06f5b0c75030154a0e277e08208f28e1
+    setting liveliness = Automatic;
     setting duration = 0;
 }
 
@@ -127,7 +127,7 @@ node type amcl_type {
     optional param bond_heartbeat_period: double = 0.1;
 
     @qos{sensor_data_profile}
-    subscribes to content(scan_topic) : RestrictedLaserScan where {count(publishers(_)) > 0};
+    subscribes to content(scan_topic) : RestrictedLaserScan;
 
     @qos{sensor_data}
     publishes to particle_cloud: nav2_msgs/ParticleCloud;
@@ -139,7 +139,7 @@ node type amcl_type {
     subscribes to initialpose : geometry_msgs/PoseWithCovarianceStamped where {count(publishers(_)) == 1};
 
     @qos{transient_reliable_qos}
-    subscribes to content(map_topic) : nav_msgs/OccupancyGrid where {count(publishers(content(_))) > 0};
+    subscribes to content(map_topic) : nav_msgs/OccupancyGrid;
 
     provides service reinitialize_global_localization: std_srvs/Empty;
     provides service request_nomotion_srv: std_srvs/Empty;
@@ -178,7 +178,7 @@ node type controller_server_kilted {
     optional param progress_checker_plugins: Plugin[] = [default(SimpleGoalChecker)];
 
     @qos{system_default_qos}
-    subscribes to odom : nav2_msgs/Odometry where {count(publishers(odom)) > 0};
+    subscribes to odom : nav2_msgs/Odometry;
 
     #@qos{param depth = 1;} # TODO: add this to a depth1 qos
     publishes to cmd_vel: geometry_msgs/TwistStamped;
@@ -425,7 +425,7 @@ system {
         context distribution = Humble;
 
         param robot_model_type = DifferentialMotionModel;
-        param scan_topic = "scan";
+        param scan_topic = "/scan";
         param map_topic = "map";
         param max_particles = 8000;
         param min_particles = 200;

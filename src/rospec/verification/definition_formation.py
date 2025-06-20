@@ -21,6 +21,8 @@ from rospec.language.nodes import (
     ServiceActionRole,
     TransformType,
     Literal,
+    FunctionCall,
+    Identifier,
 )
 from rospec.language.ttypes import (
     StructType,
@@ -188,7 +190,22 @@ def d_node_instance(context: Context, node_instance: NodeInstance) -> Context:
             continue
 
         internal_context.get_typing(st_config_name)
-        internal_context = internal_context.add_value(st_config_name, interpret(internal_context, st_config_expr))
+        interpreted_value = interpret(internal_context, st_config_expr)
+
+        if len(internal_context.temp_default_plugins) > 0:
+            # Add all from temp_default_plugins to context.typing
+            for plugin_name, plugin_ttype in internal_context.temp_default_plugins.items():
+                context = context.add_typing(plugin_name, plugin_ttype)
+                if (
+                    isinstance(plugin_ttype, PluginT)
+                    and plugin_ttype.connections is not None
+                    and len(plugin_ttype.connections) > 0
+                ):
+                    # If the plugin has connections, we need to add them to the context
+                    context = context.add_connections(plugin_name, plugin_ttype.connections)
+            internal_context.temp_default_plugins = {}
+
+        internal_context = internal_context.add_value(st_config_name, interpreted_value)
 
     # ##################################################################################################################
     # CHECKING THREE PROPERTIES IN THE SUBTYPING
@@ -213,8 +230,24 @@ def d_node_instance(context: Context, node_instance: NodeInstance) -> Context:
             if y2 in internal_context.values:
                 internal_context = internal_context.add_typing(y2, t2.ttype)
             if y2 not in internal_context.values:
-                internal_context = internal_context.add_value(y2, interpret(internal_context, t2.default_value))
+                t2_default_interpreted = interpret(internal_context, t2.default_value)
 
+                if len(internal_context.temp_default_plugins) > 0:
+                    # Add all from temp_default_plugins to context.typing
+                    for plugin_name, plugin_ttype in internal_context.temp_default_plugins.items():
+                        context = context.add_typing(plugin_name, plugin_ttype)
+                        if (
+                            isinstance(plugin_ttype, PluginT)
+                            and plugin_ttype.connections is not None
+                            and len(plugin_ttype.connections) > 0
+                        ):
+                            # If the plugin has connections, we need to add them to the context
+                            context = context.add_connections(plugin_name, plugin_ttype.connections)
+                    internal_context.temp_default_plugins = {}
+
+                internal_context = internal_context.add_value(y2, t2_default_interpreted)
+    if node_instance.name.name == "local_costmap":
+        print("hi")
     # ##################################################################################################################
     # PROPERTY: ALL DEPENDENCIES MUST BE SATISFIED
     if dependency is not None:
@@ -236,7 +269,6 @@ def d_node_instance(context: Context, node_instance: NodeInstance) -> Context:
             # Add all the connections from the plugin to the node instance
             result_connections.extend(copy.deepcopy(ttype.connections))
 
-    # TODO: ADD THE CONNECTIONS FROM THE PLUGIN INSTANCE
     for connection in result_connections:
         for name, value in internal_context.values.items():
             if isinstance(connection, TFTransform):
@@ -248,7 +280,7 @@ def d_node_instance(context: Context, node_instance: NodeInstance) -> Context:
                     internal_context, connection, name, Literal(value=value, ttype=connection.topic.ttype)
                 )
 
-        for old_name, new_name in remaps:  # TODO: WIP
+        for old_name, new_name in remaps:
             substitute_connection_with_remaps(connection, old_name, new_name)
 
     return context.add_connections(name=node_instance.name.name, connections=result_connections)
@@ -326,7 +358,22 @@ def d_plugin_instance(context: Context, plugin_instance: PluginInstance):
             continue
 
         internal_context.get_typing(st_config_name)
-        internal_context = internal_context.add_value(st_config_name, interpret(internal_context, st_config_expr))
+        st_config_expr_interpreted = interpret(internal_context, st_config_expr)
+
+        if len(internal_context.temp_default_plugins) > 0:
+            # Add all from temp_default_plugins to context.typing
+            for plugin_name, plugin_ttype in internal_context.temp_default_plugins.items():
+                context = context.add_typing(plugin_name, plugin_ttype)
+                if (
+                    isinstance(plugin_ttype, PluginT)
+                    and plugin_ttype.connections is not None
+                    and len(plugin_ttype.connections) > 0
+                ):
+                    # If the plugin has connections, we need to add them to the context
+                    context = context.add_connections(plugin_name, plugin_ttype.connections)
+            internal_context.temp_default_plugins = {}
+
+        internal_context = internal_context.add_value(st_config_name, st_config_expr_interpreted)
 
     # ##################################################################################################################
     # CHECKING THREE PROPERTIES IN THE SUBTYPING
@@ -351,7 +398,22 @@ def d_plugin_instance(context: Context, plugin_instance: PluginInstance):
             if y2 in internal_context.values:
                 internal_context = internal_context.add_typing(y2, t2.ttype)
             if y2 not in internal_context.values:
-                internal_context = internal_context.add_value(y2, interpret(internal_context, t2.default_value))
+                interpreted_y2 = interpret(internal_context, t2.default_value)
+
+                if len(internal_context.temp_default_plugins) > 0:
+                    # Add all from temp_default_plugins to context.typing
+                    for plugin_name, plugin_ttype in internal_context.temp_default_plugins.items():
+                        context = context.add_typing(plugin_name, plugin_ttype)
+                        if (
+                            isinstance(plugin_ttype, PluginT)
+                            and plugin_ttype.connections is not None
+                            and len(plugin_ttype.connections) > 0
+                        ):
+                            # If the plugin has connections, we need to add them to the context
+                            context = context.add_connections(plugin_name, plugin_ttype.connections)
+                    internal_context.temp_default_plugins = {}
+
+                internal_context = internal_context.add_value(y2, interpreted_y2)
 
     # ##################################################################################################################
     # PROPERTY: ALL DEPENDENCIES MUST BE SATISFIED
@@ -368,7 +430,6 @@ def d_plugin_instance(context: Context, plugin_instance: PluginInstance):
     for remap in plugin_instance.remaps:
         remaps.append(st_formation(internal_context, remap))
 
-    # TODO: ADD THE CONNECTIONS FROM THE PLUGIN INSTANCE
     for connection in result_connections + result_frames:
         for name, value in internal_context.values.items():
             subs_ttype = t_bottom if isinstance(connection, TFTransform) else connection.topic.ttype
@@ -376,7 +437,7 @@ def d_plugin_instance(context: Context, plugin_instance: PluginInstance):
                 internal_context, connection, name, Literal(value=value, ttype=subs_ttype)
             )
 
-        for old_name, new_name in remaps:  # TODO: WIP
+        for old_name, new_name in remaps:
             substitute_connection_with_remaps(connection, old_name, new_name)
 
     return context.add_typing(
