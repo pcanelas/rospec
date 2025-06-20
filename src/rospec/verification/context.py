@@ -2,7 +2,7 @@ import copy
 from dataclasses import dataclass, field
 from typing import Any
 
-from rospec.language.nodes import Connection, PluginInstance
+from rospec.language.nodes import Connection
 from rospec.language.ttypes import TType
 
 

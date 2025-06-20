@@ -21,8 +21,6 @@ from rospec.language.nodes import (
     ServiceActionRole,
     TransformType,
     Literal,
-    FunctionCall,
-    Identifier,
 )
 from rospec.language.ttypes import (
     StructType,
