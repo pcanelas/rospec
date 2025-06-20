@@ -8,7 +8,7 @@ node type obstacle_layer_t {
 system {
     node instance obstacle_layer: obstacle_layer_t {
         param z_voxels = 2;
-        param observation_sources = [scan, bump, irring_scan];
+        param observation_sources = []; # [scan, bump, irring_scan];
     }
     # ... information about each plugin
 }

@@ -5,7 +5,7 @@ node type custom_node_type {
 node type freenect_node_type {
     optional param publish_tf: bool = true;
 
-    broadcast camera_link to camera_rgb_frame; # assuming {publish_tf};
+    broadcast camera_link to camera_rgb_frame;
 }
 
 system {

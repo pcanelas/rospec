@@ -1,6 +1,6 @@
 node type amcl_type {
     optional param tf_broadcast: bool = false;
-    broadcast map to odom; #assuming {tf_broadcast};
+    broadcast map to odom;
 }
 
 node type ekf_node_type {

@@ -1,13 +1,13 @@
 node type openni_node_type {
     optional param depth_registration: bool = false;
 
-    publishes to camera/depth/points: sensor_msgs/PointCloud2 where {count(publishers(_)) == 1}; # assuming {depth_registration};
+    publishes to camera/depth/points: sensor_msgs/PointCloud2 where {count(publishers(_)) == 1};
 }
 
 node type amcl_type {
     optional param depth_registration: bool = false;
 
-    publishes to camera/depth/points: sensor_msgs/PointCloud2 where {count(publishers(_)) == 1}; # assuming {depth_registration};
+    publishes to camera/depth/points: sensor_msgs/PointCloud2 where {count(publishers(_)) == 1};
 }
 
 system {
