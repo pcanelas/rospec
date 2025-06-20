@@ -24,11 +24,18 @@ from rospec.verification.substitution import inverse_substitution_expr_expr
 def is_subtype_refined(context: Context, t: TType, u: TType) -> bool:
     if isinstance(t, RefinedType) and isinstance(u, RefinedType):
         # TODO: for now lets have the assumption that the left hand side is always ==
-        assert isinstance(t.refinement, rospec_nodes.FunctionCall) and t.refinement.operator.name == "==", (
-            f"{t.refinement} not =="
-        )
+        if not (isinstance(t.refinement, rospec_nodes.FunctionCall) and t.refinement.operator.name == "=="):
+            return True
+
         value = t.refinement.operands[1]  # TODO: Assuming that the right hand side is always already interpreted
         new_expr = inverse_substitution_expr_expr(u.name.name, value, u.refinement)
+
+        # With enums, the verification is a bit different, we need to check if the enum value (index) is respected
+        if isinstance(u.ttype, EnumType):
+            from rospec.verification.utils import aux_replace_enums
+
+            new_expr = aux_replace_enums(u.ttype, new_expr)
+
         is_satisfied = interpret(context, new_expr)
         assert isinstance(is_satisfied, bool)
         if not is_satisfied:
@@ -80,9 +87,7 @@ def is_subtype_struct(context: Context, t: StructType, u: StructType) -> bool:
         if t_key in u.fields:
             u_value = u.fields[t_key]
             if not is_subtype(context, t_value, u_value):
-                context.add_error(
-                    f"Struct {t} is not a subtype of {u} :: {t_key} has type {t_value} and is not subtype of {u_value}"
-                )
+                context.add_error(f"{t_key} has type {t_value} and is not subtype of {u_value}")
                 result = False
 
     return result

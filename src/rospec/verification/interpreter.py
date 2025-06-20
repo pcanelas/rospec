@@ -15,8 +15,9 @@ from rospec.language.nodes import (
     Connection,
     ServiceActionRole,
     TFTransform,
+    PluginInstance,
 )
-from rospec.language.ttypes import OptionalType
+from rospec.language.ttypes import OptionalType, t_bottom
 from rospec.verification.context import Context
 
 evaluation_context = {
@@ -54,8 +55,29 @@ evaluation_context = {
         if y.role == ServiceActionRole.CONSUMES
     ],
     "exists": lambda ctx, x: (not isinstance(ctx.typing[x.name], OptionalType)) and x.name in ctx.values,
-    # TODO: default(plugin_name):
+    "default": lambda ctx, x: interpret_default(ctx, x),
 }
+
+counter = 0
+
+
+def interpret_default(ctx: Context, default_call: Identifier):
+    from rospec.verification.definition_formation import def_formation
+
+    global counter
+    counter += 1
+    new_plugin_name = Identifier(name=f"default_{str(default_call).lower()}_{counter}", ttype=t_bottom)
+
+    new_ctx = def_formation(
+        ctx,
+        PluginInstance(
+            name=new_plugin_name,
+            plugin_ttype=default_call,
+            dependency=None,
+        ),
+    )
+    ctx.temp_default_plugins[new_plugin_name.name] = new_ctx.typing[new_plugin_name.name]
+    return new_plugin_name.name
 
 
 def interpret_connection(

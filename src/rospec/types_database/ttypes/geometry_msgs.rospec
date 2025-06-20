@@ -47,3 +47,8 @@ message geometry_msgs/Quaternion {
     field z: float64;
     field w: float64;
 }
+
+message geometry_msgs/PolygonStamped {
+    field header: std_msgs/Header;
+    field polygon: geometry_msgs/Polygon;
+}

@@ -68,6 +68,7 @@ def get_native_types(context: Context) -> Context:
     context.typing["publishers"] = AbstractionType(t_string, ArrayType(t_bottom))
     context.typing["subscribers"] = AbstractionType(t_string, ArrayType(t_bottom))
     context.typing["exists"] = AbstractionType(t_string, t_bool)
+    context.typing["default"] = AbstractionType(t_bottom, t_bottom)
 
     context.typing["qos"] = StructType(
         {

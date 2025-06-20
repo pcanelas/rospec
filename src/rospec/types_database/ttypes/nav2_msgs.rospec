@@ -14,3 +14,85 @@ message nav2_msgs/NavSatFix {
     field position_covariance: float64[9];
     field position_covariance_type: Enum[Unknown, Approximated, DiagonalKnown, Known];
 }
+
+message nav2_msgs/LoadMap {
+    field map_url: string;
+    field map: nav_msgs/OccupancyGrid;
+    field result: unit8 where {(0 <= _ and _ <= 3) or _ == 255};
+}
+
+message nav2_msgs/ParticleCloud {
+    field header: std_msgs/Header;
+    field particles: nav2_msgs/Particle[];
+}
+
+message nav2_msgs/Particle {
+    field pose: geometry_msgs/Pose;
+    field weight: float64;
+}
+
+message nav2_msgs/SpeedLimit {
+    field header: std_msgs/Header;
+    field percentage: bool;
+    field speed_limit: float64;
+}
+
+message nav2_msgs/FollowPath {
+    request field path: nav_msgs/Path;
+    request field controller_id: string;
+    request field goal_checker_id: string;
+    request field progress_checker_id: string;
+    result field result: std_msgs/Empty;
+    result field error_code: uint16 where {(1000 <= _ and _ <= 106) or _ == 0};
+    feedback field distance_to_goal: float32;
+    feedback field speed: float32;
+}
+
+message nav2_msgs/ComputePathToPose {
+    request field goal: geometry_msgs/PoseStamped;
+    request field start: geometry_msgs/PoseStamped;
+    request field planner_id: string;
+    request field use_start: bool;
+    result field path: nav_msgs/Path;
+    result field planning_time: builtin_interfaces/Duration;
+    result field error_code: uint16 where {_ == 0 or (200 <= _ and _ <= 208)};
+    result field error_msg: string;
+} where {
+    200 <= error_code and error_code <= 208 -> error_msgs != "";
+}
+
+message nav2_msgs/ComputePathThroughPoses {
+    request field goals: nav_msgs/Goals;
+    request field start: geometry_msgs/PoseStamped;
+    request field planner_id: string;
+    request field use_start: bool;
+    result field path: nav_msgs/Path;
+    result field planning_time: builtin_interfaces/Duration;
+    result field error_code: uint16 where {_ == 0 or (300 <= _ and _ <= 309)};
+    result field error_msg: string;
+} where {
+    300 <= error_code and error_code <= 309 -> error_msgs != "";
+}
+
+message nav2_msgs/GetCostmap {
+    request field specs: nav2_msgs/CostmapMetaData;
+    response field map: nav2_msgs/Costmap;
+}
+
+message nav2_msgs/CostmapFilterInfo {
+    field header: std_msgs/Header;
+    field type: uint8 where {_ == 1 or _ ==2 or _ == 3};
+    field filter_mask_topic:  string;
+    field base: float32;
+    field multiplier: float32;
+}
+
+message nav2_msgs/VoxelGrid {
+    field header: std_msgs/Header;
+    field data: uint32[];
+    field origin: geometry_msgs/Point32;
+    field resolutions: geometry_msgs/Vector3;
+    field size_x: uint32;
+    field size_y: uint32;
+    field size_z: uint32;
+}

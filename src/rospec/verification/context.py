@@ -17,6 +17,8 @@ class Context:
     errors: list[str] = field(default_factory=list)
     values: dict[str, Any] = field(default_factory=dict)
 
+    temp_default_plugins: dict[str, TType] = field(default_factory=dict)
+
     def add_typing(self, name: str, ttype: TType) -> "Context":
         copy_ctx = copy.deepcopy(self)
         copy_ctx.typing[name] = ttype
@@ -68,3 +70,12 @@ class Context:
             result += f"{key} := {value}, "
         result += ")"
         return result
+
+    # Copies everything from the new context into this one
+    def add_from_context(self, new_ctx):
+        self.typing.update(new_ctx.typing)
+        self.aliases.update(new_ctx.aliases)
+        self.connections.update(new_ctx.connections)
+        self.errors.extend(new_ctx.errors)
+        self.values.update(new_ctx.values)
+        return self
