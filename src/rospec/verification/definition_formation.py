@@ -246,8 +246,7 @@ def d_node_instance(context: Context, node_instance: NodeInstance) -> Context:
                     internal_context.temp_default_plugins = {}
 
                 internal_context = internal_context.add_value(y2, t2_default_interpreted)
-    if node_instance.name.name == "local_costmap":
-        print("hi")
+
     # ##################################################################################################################
     # PROPERTY: ALL DEPENDENCIES MUST BE SATISFIED
     if dependency is not None:

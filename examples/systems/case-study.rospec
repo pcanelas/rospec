@@ -157,7 +157,7 @@ node type amcl_type {
 }
 
 node type controller_server_kilted {
-	context distribution: AfterJazzyVersion;
+	context distribution: BeforeJazzyVersion;
 
     param odom_topic: string;
 

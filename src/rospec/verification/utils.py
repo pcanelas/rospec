@@ -26,7 +26,7 @@ from rospec.language.ttypes import (
     StructType,
     ArrayType,
     OptionalType,
-    BasicType,
+    BasicType, EnumType,
 )
 from rospec.verification.context import Context
 from rospec.verification.interpreter import interpret
@@ -220,3 +220,28 @@ def check_policies(
         result = result and dispatcher[name](context, consumer_policy[name], provider_policy[name])
 
     return result
+
+def aux_replace_enums(enum_type: EnumType, expr: Expression) -> Expression:
+    if isinstance(expr, Literal):
+        if isinstance(expr.value, str) and Identifier(name=expr.value, ttype=t_string) in enum_type.ttypes:
+            return Literal(value=enum_type.ttypes.index(Identifier(name=expr.value, ttype=t_string)), ttype=t_int)
+        return expr
+    elif isinstance(expr, Identifier):
+        if Identifier(name=expr.name, ttype=t_string) in enum_type.ttypes:
+            return Literal(value=enum_type.ttypes.index(Identifier(name=expr.name, ttype=t_string)), ttype=t_int)
+        return expr
+    elif isinstance(expr, FunctionCall):
+        return FunctionCall(
+            operator=expr.operator,
+            operands=[aux_replace_enums(enum_type, op) for op in expr.operands],
+            ttype=expr.ttype,
+        )
+    elif isinstance(expr, Message):
+        return Message(
+            fields={k: aux_replace_enums(enum_type, v) for k, v in expr.fields.items()},
+            ttype=expr.ttype,
+        )
+    elif isinstance(expr, Array):
+        return Array(elements=[aux_replace_enums(enum_type, e) for e in expr.elements], ttype=expr.ttype)
+    else:
+        raise ValueError(f"Unsupported expression type: {type(expr)}")
