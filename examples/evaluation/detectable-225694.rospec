@@ -1,7 +1,7 @@
 node type rtabmap {
      optional param publish_tf: bool = false;
 
-     broadcast map to odom; # assuming {publish_tf};
+     broadcast map to odom;
 }
 
 node type robot_localization_type {

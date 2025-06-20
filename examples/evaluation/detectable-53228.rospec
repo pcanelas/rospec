@@ -2,7 +2,7 @@ node type rgbdslam_type {
     optional param individual_cloud_out_topic: string = "topic_points";
     optional param store_pointclouds: bool = true;
 
-    publishes to content(individual_cloud_out_topic): sensor_msgs/PointCloud2; # assuming {store_pointclouds};
+    publishes to content(individual_cloud_out_topic): sensor_msgs/PointCloud2;
 }
 
 node type custom_node_type {

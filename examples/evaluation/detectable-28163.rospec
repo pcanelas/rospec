@@ -5,7 +5,7 @@ node type planning_scene_warehouse_viewer_t {
     optional argument use_collision_map: bool = false;
     optional param use_robot_data: bool = false;
 
-    subscribes to /joint_states: sensor_msgs/JointState; # assuming {use_monitor};
+    subscribes to /joint_states: sensor_msgs/JointState;
 } where {
     is_simulation -> use_monitor;
     is_simulation -> !use_robot_data;
