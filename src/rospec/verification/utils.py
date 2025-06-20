@@ -26,7 +26,8 @@ from rospec.language.ttypes import (
     StructType,
     ArrayType,
     OptionalType,
-    BasicType, EnumType,
+    BasicType,
+    EnumType,
 )
 from rospec.verification.context import Context
 from rospec.verification.interpreter import interpret
@@ -220,6 +221,7 @@ def check_policies(
         result = result and dispatcher[name](context, consumer_policy[name], provider_policy[name])
 
     return result
+
 
 def aux_replace_enums(enum_type: EnumType, expr: Expression) -> Expression:
     if isinstance(expr, Literal):

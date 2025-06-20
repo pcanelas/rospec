@@ -33,6 +33,7 @@ def is_subtype_refined(context: Context, t: TType, u: TType) -> bool:
         # With enums, the verification is a bit different, we need to check if the enum value (index) is respected
         if isinstance(u.ttype, EnumType):
             from rospec.verification.utils import aux_replace_enums
+
             new_expr = aux_replace_enums(u.ttype, new_expr)
 
         is_satisfied = interpret(context, new_expr)
@@ -86,9 +87,7 @@ def is_subtype_struct(context: Context, t: StructType, u: StructType) -> bool:
         if t_key in u.fields:
             u_value = u.fields[t_key]
             if not is_subtype(context, t_value, u_value):
-                context.add_error(
-                    f"{t_key} has type {t_value} and is not subtype of {u_value}"
-                )
+                context.add_error(f"{t_key} has type {t_value} and is not subtype of {u_value}")
                 result = False
 
     return result

@@ -59,6 +59,8 @@ evaluation_context = {
 }
 
 counter = 0
+
+
 def interpret_default(ctx: Context, default_call: Identifier):
     from rospec.verification.definition_formation import def_formation
 
