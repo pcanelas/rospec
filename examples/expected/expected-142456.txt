@@ -1,1 +1,3 @@
+QoS rule reliability not satisfied: Reliable !< BestEffort
+QoS rules not satisfied for subscriber and publisher
 Color format not satisfied: RGB8 != Grayscale
