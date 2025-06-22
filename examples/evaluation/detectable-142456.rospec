@@ -1,11 +1,11 @@
-policy instance depth5qos: qos {
-    setting history = KeepLast;
+policy instance best_effort_qos5: qos {
     setting depth = 5;
+    setting reliability = BestEffort;
 }
 
-policy instance depth1qos: qos {
-    setting history = KeepLast;
-    setting depth = 1;
+policy instance reliable_qos5: qos {
+    setting depth = 5;
+    setting reliability = Reliable;
 }
 
 policy instance RGB8: color_format {
@@ -19,13 +19,13 @@ policy instance Grayscale: color_format {
 node type openni_camera_driver_depth_type {
     optional param depth_registration: bool = true;
 
-    @qos{depth1qos}
+    @qos{best_effort_qos5}
     @color_format{Grayscale}
     publishes to /camera/rgb/image_raw: sensor_msgs/Image;
 }
 
 node type custom_node_type {
-    @qos{depth5qos}
+    @qos{reliable_qos5}
     @color_format{RGB8}
     subscribes to /camera/rgb/image_raw: sensor_msgs/Image;
 }

@@ -218,7 +218,7 @@ def check_policies(
 
     result = True
     for name in consumer_policy.keys():
-        result = result and dispatcher[name](context, consumer_policy[name], provider_policy[name])
+        result = dispatcher[name](context, consumer_policy[name], provider_policy[name]) and result
 
     return result
 
