@@ -1,0 +1,105 @@
+node type route_server_type {
+
+    argument MAP_TYPE: Enum[Depot, Warehouse];
+    # argument MAP_POSES_DICT: dict<string>; # TODO: we do not support dicts yet
+    # argument ROUTE_POSES_DICT: dict<string>; # TODO: we do not support dicts yet
+
+    optional param base_frame: string = "base_link";
+    optional param route_frame: string = "route";
+
+    optional param path_density: double = 0.05; # TODO: if using nav_msgs/Path route rather than the collection of nodes & edges
+    optional param max_iterations: int where {_ >= 0} = 0;
+    optional param smooth_corners: bool = false;
+    optional param smoothing_radius: double = 1.0;
+    optional param costmap_topic: string = "global_costmap/costmap_raw";
+    optional param tracker_update_rate: double = 50.0; # TODO: when using ComputeAndTrackRoute
+    optional param aggregate_blocked_ids: bool = false;
+    optional param boundary_radius_to_achieve_node: double = 1.0; # TODO: when using ComputeAndTrackRoute
+    optional param radius_to_achieve_node: double = 1.0; # TODO: when using ComputeAndTrackRoute
+    optional param max_prune_dist_from_edge: double where {_ >= 0.0} = 8.0;
+    optional param min_prune_dist_from_goal: double where {_ >= 0.0} = 0.15; # TODO: if using use_poses
+    optional param min_prune_dist_from_start: double where {_ >= 0.0} = 0.15; # TODO: if using use_poses
+    optional param prune_goal: bool = true; # TODO: if using use_poses
+    optional param enable_nn_search: bool = true;
+    optional param max_nn_search_iterations: int where {_ >= 0} = 10000;
+    optional param num_nearest_nodes: int where {_ >= 0} = 5;
+    optional param graph_filepath: string = "";
+    optional param graph_file_loader: Plugin = default(GeoJsonGraphFileLoader);
+    # optional param graph_file_loader.plugin: Plugin = default(GeoJsonGraphFileLoader); # nav2_route::GeoJsonGraphFileLoader
+    optional param edge_cost_functions: Plugin[] = [default(DistanceScorer), default(DynamicEdgesScorer)];
+    optional param operations: Plugin[] = [default(AdjustSpeedLimit), default(ReroutingService)];
+    optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
+    optional param allow_parameter_qos_overrides: bool = true;
+}
+
+plugin type CostmapScorer {
+    optional param weight: double = 1.0;
+    optional param costmap_topic: string = "global_costmap/costmap_raw";
+    optional param max_cost: double = 253.0;
+    optional param use_maximum: bool = true;
+    optional param invalid_on_collision: bool = true;
+    optional param invalid_off_map: bool = true;
+    optional param check_resolution: int = 1;
+}
+
+plugin type TimeScorer {
+    optional param weight: double = 1.0;
+    optional param speed_tag: string = "abs_speed_limit";
+    optional param time_tag: string = "abs_time_limit";
+    optional param max_vel: int where {_ >= 0} = 0.5;
+}
+
+plugin type PenaltyScorer {
+    optional param weight: double = 1.0;
+    optional param penalty_tag: string = "penalty";
+}
+
+plugin type SemanticScorer {
+    optional param weight: double = 1.0;
+    optional param semantic_classes: string[] = [];
+    optional param semantic_key: string = "class";
+}
+
+plugin type StartPoseOrientationScorer {
+    optional param orientation_weight: double = 1.0;
+    optional param use_orientation_threshold: bool = false;
+    optional param orientation_tolerance: double = 3.14156/2;
+} where {
+    use_orientation_threshold -> exists(orientation_tolerance);
+}
+
+plugin type GoalPoseOrientationScorer {
+    optional param orientation_weight: double = 1.0;
+    optional param use_orientation_threshold: bool = false;
+    optional param orientation_tolerance: double = 3.14156/2;
+} where {
+    use_orientation_threshold -> exists(orientation_tolerance);
+}
+
+plugin type DynamicEdgesScorer { }
+
+plugin type AdjustSpeedLimit {
+    optional param speed_limit_topic: string = "speed_limit";
+    optional param speed_tag: string = "speed_limit";
+
+    publishes to content(speed_limit_topic): std_msgs/Float64;
+} where {
+    speed_limit_topic != "speed_limit" -> exists(speed_tag);
+}
+
+plugin type CollisionMonitor {
+    optional param costmap_topic: string = "global_costmap/costmap_raw";
+    optional param rate: double where {_ > 0.0} = 1.0;
+    optional param max_cost: double = 253.0;
+    optional param max_collision_dist: double where {_ >= 0.0} = 5.0;
+    optional param check_resolution: int where {_ > 0} = 1;
+    optional param reroute_on_collision: bool = true;
+}
+
+plugin type TimeMarker {
+    optional param time_tag; string = "abs_time_taken";
+}
+
+plugin type GeoJsonGraphFileLoader {
+    # TODO:
+}
