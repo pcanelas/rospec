@@ -30,6 +30,8 @@ node type route_server_type {
     optional param operations: Plugin[] = [default(AdjustSpeedLimit), default(ReroutingService)];
     optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
     optional param allow_parameter_qos_overrides: bool = true;
+
+    # TODO: Connections
 }
 
 plugin type CostmapScorer {
@@ -97,7 +99,7 @@ plugin type CollisionMonitor {
 }
 
 plugin type TimeMarker {
-    optional param time_tag; string = "abs_time_taken";
+    optional param time_tag: string = "abs_time_taken";
 }
 
 plugin type GeoJsonGraphFileLoader {

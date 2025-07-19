@@ -1,0 +1,33 @@
+type alias Meter: double;
+type alias Radian: double;
+type alias Second: double where {_ >= 0};
+type alias Distro: OrderedEnum[DiamondBlack, Electrict, Fuerte, Groovy, Hydro, Indigo, Jade, Kinetic, Lunar, Melodic, Noetic, Jazzy];
+
+node type loopback_simulator_type {
+
+    optional context distribution: Distro where {_ >= Jazzy} = Jazzy;
+
+    optional param update_duration: Second = 0.01;
+    optional param base_frame_id: string = "base_link";
+    optional param odom_frame_id: string = "odom";
+    optional param map_frame_id: string = "map";
+    optional param scan_frame_id: string = "base_scan";
+    optional param enable_stamped_cmd_vel: bool = true;
+
+    optional param scan_publish_dur: Second = 0.1;
+    optional param publish_map_odom_tf: bool = true;
+    optional param publish_clock: bool = true;
+    optional param scan_range_min: Meter where {_ >= 0.05} = 0.05;
+    optional param scan_range_max: Meter where {_ <= 30.0} = 30.0;
+    optional param scan_angle_min: Radian = -3.14;
+    optional param scan_angle_max: Radian = 3.14;
+    optional param scan_angle_increment: Radian = 0.0261;
+    optional param scan_use_inf: bool = true;
+
+    broadcast content(map_frame_id) to content(odom_frame_id); # TODO: if {publish_map_odom_tf};
+    broadcast content(clock) to "/clock"; # TODO: if {publish_clock};
+
+} where {
+    scan_range_min < scan_range_max;
+    scan_angle_min < scan_angle_max;
+}

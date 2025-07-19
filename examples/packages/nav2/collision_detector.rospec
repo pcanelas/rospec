@@ -1,0 +1,49 @@
+node type collision_detector_type {
+    optional param frequency: double = 10.0;
+    optional param base_frame_id: string = "base_footprint";
+    optional param odom_frame_id: string = "odom";
+    optional param transform_tolerance: double where {_ >= 0} = 0.1;
+    optional param source_timeout: double where {_ >= 0} = 2.0;
+    optional param base_shift_correction: bool = true;
+    optional param polygons: Plugin[] = [];
+    optional param observation_sources: string[] = [];
+
+}
+
+node type polygon_collision_detector_type {
+    param type: Enum[Polygon, Circle];
+    param points: string;
+    param polygon_sub_topic: string;
+    optional param radius: double where {_ >= 0} = 0.0;
+    optional param action_type: string where {_ == "none"} = "none";
+    optional param min_points: int = 4;
+    optional param visualize: bool = false;
+    param polygon_pub_topic: string;
+    optional param enabled: bool = true;
+    publishes to content(polygon_pub_topic): geometry_msgs/PolygonStamped; # TODO if {visualize};
+} where {
+    !(exists(points) and exists(polygon_sub_topic));
+    type == Polygon -> !exists(radius);
+    type == Circle -> exists(radius);
+}
+
+
+plugin type detector_observation_sources {
+    optional param type: Enum[Scan, Pointcloud, Range, Polygon] = Scan;
+    optional param topic: string = "scan";
+    optional param min_height: double where {_ >= 0} = 0.05;
+    optional param max_height: double where {_ >= 0} = 0.5;
+    optional param obstacles_angle: double = 0.01745;
+    optional param sampling_distance: double = 0.1;
+    optional param enabled: bool = true;
+    optional param source_timeout: double where {_ >= 0} = 2.0;
+    optional param bond_heartbeat_period: double = 0.1;
+    optional param allow_parameter_qos_overrides: bool = true;
+} where {
+    min_height <= max_height;
+
+    exists(min_height) -> type == Pointcloud;
+    exists(max_height) -> type == Pointcloud;
+    exists(obstacle_angle) -> type == Range;
+    exists(sampling_distance) -> type == Polygon;
+}

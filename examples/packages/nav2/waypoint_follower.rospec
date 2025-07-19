@@ -1,0 +1,39 @@
+type alias Positive: int where {_ > 0};
+type alias Period: double where {_ >= 0};
+type alias Second: double where {_ >= 0};
+type alias Millisecond: double where {_ >= 0};
+type alias Path: string;
+
+node type waypoint_follower_type {
+    optional param stop_on_failure: bool = true;
+    optional param loop_rate: Positive = 20;
+    optional param global_frame_id: string = "map";
+    optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
+    optional param bond_heartbeat_period: Period = 0.1;
+    optional param allow_parameter_qos_overrides: bool = true;
+    optional param waypoint_task_executor_plugin: Plugin = default(WaypointTaskExecutor);
+}
+
+plugin type WaypointTaskExecutor {
+    optional param enabled: bool = true;
+    optional param waypoint_pause_duration: Millisecond = 0;
+}
+
+plugin type PhotoAtWaypoint {
+    optional param enabled: bool = true;
+    optional param camera_image_topic_name: string = "/camera/color/image_raw";
+    optional param save_images_dir: Path = "/tmp/waypoint_images";
+    optional param image_format: Enum[PNG, JPEG] = PNG;
+    optional param allow_parameter_qos_overrides: bool = true;
+
+    subscribes to content(camera_image_topic_name): sensor_msgs/Image;
+}
+
+plugin type InputAtWaypoint {
+    optional param enabled: bool = true;
+    optional param timeout: Second = 10.0;
+    optional param input_topic: string = "input_at_waypoint/input";
+    optional param allow_parameter_qos_overrides: bool = true;
+
+    subscribes to content(input_topic): std_msgs/Empty;
+}
