@@ -1,0 +1,12 @@
+# Requires some notion of import for simple_smoother, or pass the other as input
+
+node type smoother_server {
+    optional param costmap_topic: string = "global_costmap/costmap_raw";
+    optional param footprint_topic: string = "global_costmap/published_footprint";
+    optional param transform_tolerance: double where {_ >= 0} = 0.1;
+    optional param robot_base_frame: string = "base_link";
+    optional param smoother_plugins: Plugin[] = [default(simple_smoother)];
+    optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
+    optional param bond_heartbeat_period: double where {_ >= 0} = 0.1;
+    optional param allow_parameter_qos_overrides: bool = true;
+}

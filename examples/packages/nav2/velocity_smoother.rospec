@@ -1,0 +1,21 @@
+type alias Velocity: double;
+type alias Hertz: double;
+type alias Second: double where {_ >= 0};
+
+node type velocity_smoother_type {
+    optional param use_realtime_priority: bool = false;
+    optional param smoothing_frequency: Hertz = 20.0;
+    optional param scale_velocities: bool = false;
+    optional param feedback: Enum[OPEN_LOOP, CLOSED_LOOP] = OPEN_LOOP;
+    optional param max_velocity: Velocity[] where {len(_) == 3 or len(_) == 6} = [0.5, 0.0, 2.5];
+    optional param deadband_velocity: Velocity[] where {len(_) == 3 or len(_) == 6} = [0.0, 0.0, 0.0];
+    optional param velocity_timeout: Second = 1.0;
+    optional param max_accel: Velocity[] where {len(_) == 3 or len(_) == 6} = [2.5, 0.0, 3.2];
+    optional param max_decel: Velocity[] where {len(_) == 3 or len(_) == 6} = [-2.5, 0.0, -3.2];
+    optional param odom_topic: string = "odom";
+    optional param enable_stamped_cmd_vel: bool = true; # TODO: for Jazzy or older default is false
+    optional param bond_heartbeat_period: Second = 0.1;
+    optional param allow_parameter_qos_overrides: bool = true;
+} where {
+    exists(odom_topic) -> feedback == CLOSED_LOOP;
+}
