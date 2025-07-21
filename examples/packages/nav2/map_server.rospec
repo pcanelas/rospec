@@ -1,0 +1,6 @@
+node type map_server {
+    param yaml_filename: string;
+    optional param topic_name: string = "map";
+    optional param frame_id: string = "map";
+    optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
+}

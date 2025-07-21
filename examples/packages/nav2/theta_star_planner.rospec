@@ -1,0 +1,8 @@
+plugin type ThetaStarPlanner {
+    optional param how_many_corners: int where {_ == 4 or _ == 8} = 4;
+    optional param w_euc_cost: double = 1.0;
+    optional param w_traversal_cost: double = 2.0;
+    optional param use_final_approach_orientation: bool = false;
+    optional param allow_unknown: bool = true;
+    optional param terminal_checking_interval: int where {_ > 0} = 5000;
+}

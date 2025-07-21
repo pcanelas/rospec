@@ -1,0 +1,10 @@
+type alias Second: double where {_ >= 0.0};
+
+node type planner_server {
+    optional param planner_plugins: string[] = [default(GridBased)];
+    optional param expected_planner_frequency: double = 20.0;
+    optional param bond_heartbeat_period: double where {_ >= 0.0} = 0.1;
+    optional param costmap_update_timeout: Second = 1.0;
+    optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
+    optional param allow_parameter_qos_overrides: bool = true;
+}

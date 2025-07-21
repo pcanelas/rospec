@@ -1,0 +1,9 @@
+node type costmap_filter_info_server {
+    optional param type: int where {_ >= 0 and _ <= 3} = 0;
+    optional param filter_info_topic: string = "costmap_filter_info";
+    optional param mask_topic: string = "filter_mask";
+    optional param base: double = 0.0;
+    optional param multiplier: double = 1.0;
+    optional param bond_heartbeat_period: double = 0.1;
+    optional param allow_parameter_qos_overrides: bool = true;
+}
