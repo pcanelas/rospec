@@ -1,0 +1,106 @@
+type alias Hertz: double where {_ > 0.0};
+type alias Second: double where {_ >= 0.0};
+type alias IntSecond: int where {_ >= 0};
+
+node type ekf_localization_node {
+    optional param frequency: Hertz = 30.0;
+    optional param sensor_timeout: Second = 0.1;
+    optional param two_d_mode: bool = false;
+    optional param map_frame: string = "map";
+    optional param odom_frame: string = "odom";
+    optional param base_link_frame: string = "base_link";
+    optional param base_link_output_frame: string = content(base_link_frame);
+    optional param world_frame: string = content(odom_frame);
+    optional param transform_time_offset: Second = 0.0;
+    optional param transform_timeout: Second = 0;
+    # TODO: We cannot handle the way [sensor] are defined... it is an arbitrary number of sensors
+    optional param gravitational_acceleration: double where {_ >= 0.0} = 9.80665;
+    optional param initial_state: double[] = [5.0,  4.0,  3.0,
+                                              0.0,  0.0,  1.57,
+                                              0.1,  0.2,  0.3,
+                                              0.0,  0.0,  0.0,
+                                              0.0,  0.0,  0.0];
+    optional param publish_tf: bool = true; # TODO: a lot of dependencies with frame publishing
+    optional param publish_acceleration: bool = false;
+    optional param print_diagnostics: bool = false;
+    optional param use_control: bool = false;
+    optional param stamped_control: bool = false;
+    optional param control_timeout: Second = 0.1;
+    optional param control_config: bool[] where {len(_) == 6} = [true, false, false, false, false, true];
+    optional param acceleration_limits: double[] where {len(_) == 6} = [1.3, 0.0, 0.0, 0.0, 0.0, 3.2];
+    optional param deceleration_limits: double[] where {len(_) == 6} = [1.3, 0.0, 0.0, 0.0, 0.0, 4.5];
+    optional param acceleration_gains: double[] where {len(_) == 6} = [0.8, 0.0, 0.0, 0.0, 0.0, 0.9];
+    optional param deceleration_gains: double[] where {len(_) == 6} = [1.0, 0.0, 0.0, 0.0, 0.0, 1.0];
+
+    optional param smooth_lagged_data: bool = false;
+    optional param history_length: IntSecond = 0;
+
+    # TODO: Missing more sensor information
+
+    optional param debug: bool = false;
+    optional param debug_out_file: string = "";
+    optional param process_noise_covariance: double[] = [
+                                   0.05,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+                                   0.0,    0.05,   0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+                                   0.0,    0.0,    0.06,   0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+                                   0.0,    0.0,    0.0,    0.03,   0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+                                   0.0,    0.0,    0.0,    0.0,    0.03,   0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+                                   0.0,    0.0,    0.0,    0.0,    0.0,    0.06,   0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+                                   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.025,   0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+                                   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.025,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+                                   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.04,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+                                   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.01,   0.0,    0.0,    0.0,    0.0,    0.0,
+                                   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.01,   0.0,    0.0,    0.0,    0.0,
+                                   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.02,   0.0,    0.0,    0.0,
+                                   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.01,   0.0,    0.0,
+                                   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.01,   0.0,
+                                   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.015];
+    optional param dynamic_process_noise_covariance: bool = false;
+    optional param initial_estimate_covariance: double[] = [
+                                      0.000000001, 0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,    0.0,    0.0,
+                                      0.0,    0.000000001, 0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,    0.0,    0.0,
+                                      0.0,    0.0,    0.000000001, 0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,    0.0,    0.0,
+                                      0.0,    0.0,    0.0,    0.000000001, 0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,    0.0,    0.0,
+                                      0.0,    0.0,    0.0,    0.0,    0.000000001, 0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,    0.0,    0.0,
+                                      0.0,    0.0,    0.0,    0.0,    0.0,    0.000000001, 0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,    0.0,    0.0,
+                                      0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.000000001, 0.0,    0.0,    0.0,     0.0,     0.0,     0.0,    0.0,    0.0,
+                                      0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.000000001, 0.0,    0.0,     0.0,     0.0,     0.0,    0.0,    0.0,
+                                      0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.000000001, 0.0,     0.0,     0.0,     0.0,    0.0,    0.0,
+                                      0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.000000001,  0.0,     0.0,     0.0,    0.0,    0.0,
+                                      0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.000000001,  0.0,     0.0,    0.0,    0.0,
+                                      0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.000000001,  0.0,    0.0,    0.0,
+                                      0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.000000001, 0.0,    0.0,
+                                      0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,    0.000000001, 0.0,
+                                      0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,    0.0,    0.000000001];
+    optional param reset_on_time_jump: bool = false;
+    optional param predict_to_current_time: bool = false;
+    optional param disabled_at_startup: bool = false;
+} where {
+    !exists(map_frame) -> (world_frame == odom_frame);
+    exists(control_timeout) -> use_control;
+    exists(control_config) -> use_control;
+
+    # For acceleration limits constraints
+    exists(acceleration_limits) -> use_control;
+    (acceleration_limits[0] > 0.0) -> control_config[0];
+    (acceleration_limits[1] > 0.0) -> control_config[1];
+    (acceleration_limits[2] > 0.0) -> control_config[2];
+    (acceleration_limits[3] > 0.0) -> control_config[3];
+    (acceleration_limits[4] > 0.0) -> control_config[4];
+    (acceleration_limits[5] > 0.0) -> control_config[5];
+
+    # For deceleration limits constraints
+    exists(deceleration_limits) -> use_control;
+    (deceleration_limits[0] > 0.0) -> control_config[0];
+    (deceleration_limits[1] > 0.0) -> control_config[1];
+    (deceleration_limits[2] > 0.0) -> control_config[2];
+    (deceleration_limits[3] > 0.0) -> control_config[3];
+    (deceleration_limits[4] > 0.0) -> control_config[4];
+    (deceleration_limits[5] > 0.0) -> control_config[5];
+
+    exists(acceleration_gains) -> use_control;
+    exists(deceleration_gains) -> use_control;
+
+    exists(history_length) -> smooth_lagged_data;
+    exists(debug_out_file) -> debug;
+}
