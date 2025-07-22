@@ -1,1 +1,67 @@
-# TODO:
+type alias Second: double where {_ >= 0.0};
+type alias RadianPerSecond: double;
+type alias RadianPerSecondSecond: double;
+
+node type behavior_server {
+    optional param local_costmap_topic: string = "local_costmap/costmap_raw";
+    optional param global_costmap_topic: string = "global_costmap/costmap_raw";
+    optional param local_footprint_topic: string = "local_costmap/published_footprint";
+    optional param cycle_frequency: double where {_ > 0.0} = 10.0;
+    optional param transform_tolerance: double where {_ >= 0.0} = 0.1;
+    optional param local_frame: string = "odom";
+    optional param global_frame: string = "map";
+    optional param robot_base_frame: string = "base_link";
+    optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
+    optional param behavior_plugins: Plugin[] = [default(spin), default(back_up), default(drive_on_heading), default(wait)];
+}
+
+plugin type spin {
+    optional param plugin: Plugin = default(Spin);
+}
+
+plugin type back_up {
+    optional param plugin: Plugin = default(BackUp);
+}
+
+plugin type drive_on_heading {
+    optional param plugin: Plugin = default(DriveOnHeading);
+}
+
+plugin type wait {
+    optional param plugin: Plugin = default(Wait);
+}
+
+plugin type Spin {
+    optional param simulate_ahead_time: Second = 2.0;
+    optional param max_rotational_vel: RadianPerSecond = 1.0;
+    optional param min_rotational_vel: RadianPerSecond = 0.4;
+    optional param rotational_acc_lim: RadianPerSecondSecond = 3.2;
+    optional param enable_stamped_cmd_vel: bool = true; # TODO: for Jazzy or older default is false
+} where {
+    max_rotational_vel >= min_rotational_vel;
+}
+
+plugin type BackUp {
+    optional param simulate_ahead_time: Second = 2.0;
+    optional param enable_stamped_cmd_vel: bool = true; # TODO: for Jazzy or older default is false
+    optional param acceleration_limit: double = 2.5;
+    optional param deceleration_limit: double = -2.5;
+    optional param minimum_speed: double = 0.1;
+}
+
+plugin type DriveOnHeading {
+    optional param simulate_ahead_time: Second = 2.0;
+    optional param enable_stamped_cmd_vel: bool = true; # TODO: for Jazzy or older default is false
+    optional param bond_heartbeat_period: Second = 0.1;
+    optional param allow_parameter_qos_overrides: bool = true;
+    optional param acceleration_limit: double = 2.5;
+    optional param deceleration_limit: double = -2.5;
+    optional param minimum_speed: double = 0.1;
+}
+
+plugin type AssistedTeleop {
+    optional param projection_time: Second = 1.0;
+    optional param simulation_time_step: Second = 0.1;
+    optional param cmd_vel_teleop: string = "cmd_vel_teleop";
+    optional param enable_stamped_cmd_vel: bool = true; # TODO: for Jazzy or older default is false
+}
