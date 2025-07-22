@@ -3,6 +3,7 @@ import pytest
 
 from rospec.language.frontend import parse_program
 
+
 # Gather all .rospec files under examples/
 def get_rospec_files():
     rospec_files = []
@@ -11,6 +12,7 @@ def get_rospec_files():
             if file.endswith(".rospec"):
                 rospec_files.append(os.path.join(root, file))
     return rospec_files
+
 
 @pytest.mark.parametrize("rospec_path", get_rospec_files())
 def test_parsing(rospec_path):

@@ -61,7 +61,7 @@ uv add rospec
 3. Install in development mode (if you plan to contribute):
 
    ```bash
-   uv sync --dev
+   uv sync --extra dev
    ```
 
 ## Usage
@@ -71,6 +71,7 @@ To run the CLI, you can use the following command:
 
 ```bash
 rospec --specifications path/to/your/spec.rospec
+uv run pre-commit install
 ```
 
 Or if installed in development mode:

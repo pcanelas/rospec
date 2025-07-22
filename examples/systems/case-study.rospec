@@ -494,6 +494,6 @@ system {
         param plugins = [voxel_layer, default(InflationLayer)];
         param filters = [default(KeepOutFilter)];
     }
-    
+
     node instance gazebo: gazebo_type { }
 }

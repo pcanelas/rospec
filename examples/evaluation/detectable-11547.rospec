@@ -25,4 +25,3 @@ system {
         param depth_frame_id = "/openni_depth_optical_frame_2";
     }
 }
-
