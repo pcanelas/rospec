@@ -1,5 +1,4 @@
 import os
-import glob
 import pytest
 
 from rospec.language.frontend import parse_program
