@@ -20,6 +20,13 @@ repos:
       - id: codespell
         args:
           - --ignore-words-list=rospec
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: pytest
+        language: system
+        pass_filenames: false
   # Should be the last one:
   - repo: meta
     hooks:
