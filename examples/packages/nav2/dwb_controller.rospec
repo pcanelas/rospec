@@ -1,0 +1,71 @@
+type alias Meter: double where {_ >= 0.0};
+type alias Second: double where {_ >= 0.0};
+
+type alias MeterPerSecond: double;
+type alias RadianPerSecond: double;
+
+plugin type DWBLocalPlanner {
+    optional param critics: Plugin[] = [];
+    optional param default_critic_namespaces: string[] = ["dwb_critics"];
+    optional param prune_plan: bool = true;
+    optional param shorten_transformed_plan: bool = true;
+    optional param prune_distance: Meter = 2.0;
+    optional param forward_prune_distance: double where {_ >= 0.0 or _ == -1.0} = 2.0;
+    optional param debug_trajectory_details: bool = false;
+    optional param trajectory_generator_name: Plugin = default(StandardTrajectoryGenerator);
+    optional param goal_checker_name: Plugin = default(SimpleGoalChecker);
+    optional param transform_tolerance: Second = 0.1;
+    optional param short_circuit_trajectory_evaluation: bool = true;
+    # Did not include legacy params..
+}
+
+plugin type XYThetaIterator {
+    optional param vx_samples: int = 20;
+    optional param vy_samples: int = 5;
+    optional param vtheta_samples: int = 20;
+}
+
+plugin type Kinematic {
+    optional param max_vel_theta: RadianPerSecond = 0.0;
+    optional param min_speed_xy: MeterPerSecond = 0.0;
+    optional param max_speed_xy: MeterPerSecond = 0.0;
+    optional param min_speed_theta: RadianPerSecond = 0.0;
+    optional param min_vel_x: MeterPerSecond = 0.0;
+    optional param max_vel_x: MeterPerSecond = 0.0;
+    optional param min_vel_y: MeterPerSecond = 0.0;
+    optional param max_vel_y: MeterPerSecond = 0.0;
+    optional param acc_lim_x: double = 0.0;
+    optional param acc_lim_y: double = 0.0;
+    optional param acc_lim_theta: double = 0.0;
+    optional param decel_lim_x: double = 0.0;
+    optional param decel_lim_y: double = 0.0;
+    optional param decel_lim_theta: double = 0.0;
+} where {
+    min_vel_x <= max_vel_x;
+    min_vel_y <= max_vel_y;
+    min_speed_xy <= max_speed_xy;
+}
+
+plugin type PublisherPlugin {
+    optional param publish_evaluation: bool = true;
+    optional param publish_global_plan: bool = true;
+    optional param publish_transformed_plan: bool = true;
+    optional param publish_local_plan: bool = true;
+    optional param publish_trajectories: bool = true;
+    optional param publish_cost_grid_pc: bool = false;
+    optional param marker_lifetime: double = 0.1;
+}
+
+plugin type LimitedAccelGenerator {
+    optional param sim_time: Second = 1.7;
+}
+
+plugin type StandardTrajectoryGenerator {
+    optional param sim_time: Second = 1.7;
+    optional param discretize_by_time: bool = false;
+    optional param time_granularity: Second = 0.5;
+    optional param linear_granularity: Meter = 0.5;
+    optional param angular_granularity: Meter = 0.025;
+    optional param include_last_point: bool = true;
+    optional param limit_vel_cmd_in_traj: bool = false;
+}

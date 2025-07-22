@@ -1,0 +1,9 @@
+node type simple_smoother {
+    optional param tolerance: double = 0.0000000001;
+    optional param do_refinement: bool = true;
+    optional param refinement: int where {_ >= 1} = 2;
+    optional param max_its: int where {_ > 0} = 1000;
+    optional param w_data: double where {_ >= 0} = 0.2;
+    optional param w_smooth: double where {_ >= 0} = 0.3;
+    optional param enforce_path_inversion: bool = true;
+}

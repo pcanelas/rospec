@@ -1,0 +1,54 @@
+type alias MeterPerSecond: double;
+type alias MeterPerSecondSecond: double;
+type alias Radian: double;
+type alias RadianPerSecondSecond: double;
+type alias Meter: double where {_ >= 0.0};
+type alias Second: double where {_ >= 0.0};
+
+plugin type RegulatedPurePursuitController {
+    optional param desired_linear_vel: MeterPerSecond = 0.5;
+    optional param lookahead_dist: Meter = 0.6;
+    optional param min_lookahead_dist: Meter = 0.3;
+    optional param max_lookahead_dist: Meter = 0.9;
+    optional param look_ahead: Second = 1.5;
+    optional param rotate_to_heading_angular_vel: double = 0.5;
+    optional param transform_tolerance: Second = 0.1;
+    optional param use_velocity_scaled_lookahead_dist: bool = false;
+    optional param min_approach_linear_velocity: MeterPerSecond where {_ >= 0.01} = 0.05;
+    optional param approach_velocity_scaling_dist: Meter = 0.6;
+    optional param use_collision_detection: bool = true;
+    optional param max_allowed_time_to_collision_up_to_carrot: double = 1.0;
+    optional param use_regulated_linear_velocity_scaling: bool = true;
+    optional param use_cost_regulated_linear_velocity_scaling: bool = true;
+    optional param cost_scaling_dist: Meter = 0.6;
+    optional param cost_scaling_gain: double where {_ <= 1.0} = 1.0;
+    optional param regulated_linear_scaling_min_radius: Meter = 0.9;
+    optional param regulated_linear_scaling_min_speed: MeterPerSecond where {_ > 0.1} = 0.25;
+    optional param use_fixed_curvature_lookahead: bool = false;
+    optional param curvature_lookahead_dist: Meter = 0.6;
+    optional param use_rotate_to_heading: bool = true;
+    optional param allow_reversing: bool = false;
+    optional param rotate_to_heading_min_angle: Radian = 0.785;
+    optional param max_angular_accel: RadianPerSecondSecond = 3.2;
+    optional param use_cancel_deceleration: bool = false;
+    optional param cancel_deceleration: MeterPerSecondSecond = 3.2;
+    # optional param max_robot_pose_search_dist: double = ???;
+    optional param interpolate_curvature_after_goal: bool = false;
+    optional param stateful: bool = true;
+    optional param allow_parameter_qos_overrides: bool = true;
+    optional param min_distance_to_obstacle: double = 2.0;
+} where {
+    min_lookahead_dist <= max_lookahead_dist;
+    !(use_rotate_to_heading and allow_reversing);
+    interpolate_curvature_after_goal -> use_fixed_curvature_lookahead;
+    min_distance_to_obstacle <= max_lookahead_dist;
+    exists(lookahead_dist) -> !use_velocity_scaled_lookahead_dist;
+    exists(min_lookahead_dist) -> !use_velocity_scaled_lookahead_dist;
+    exists(max_lookahead_dist) -> !use_velocity_scaled_lookahead_dist;
+    exists(rotate_to_heading_angular_vel) -> use_rotate_to_heading;
+    exists(max_allowed_time_to_collision_up_to_carrot) -> use_collision_detection;
+    exists(cost_scaling_dist) -> use_cost_regulated_linear_velocity_scaling;
+    exists(regulated_linear_scaling_min_radius) -> use_regulated_linear_velocity_scaling;
+    exists(rotate_to_heading_min_angle) -> use_rotate_to_heading;
+    exists(max_angular_accel) -> use_rotate_to_heading;
+}

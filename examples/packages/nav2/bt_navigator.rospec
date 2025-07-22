@@ -1,0 +1,47 @@
+type alias IntMillisecond: int where {_ >= 0};
+type alias Second: double where {_ >= 0.0};
+
+node type bt_navigator {
+    optional param navigators: Plugin[] = [default(navigate_to_pose), default(navigate_through_poses)]; # TODO: This is only for Iron or newer
+    optional param default_nav_to_pose_bt_xml: string = "";
+    optional param default_nav_through_poses_bt_xml: string = "";
+    optional param always_reload_bt_xml: bool = false;
+    optional param plugin_lib_names: string[] = [];     # TODO: This is only for Jazzy or newer
+    optional param bt_loop_duration: IntMillisecond = 10;
+    optional param filter_duration: Second = 0.3;
+    optional param default_server_timeout: IntMillisecond = 20;
+    optional param wait_for_service_timeout: IntMillisecond = 1000;
+    optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
+    optional param transform_tolerance: Second = 0.1;
+    optional param global_frame: string = "map";
+    optional param robot_base_frame: string = "base_link";
+    optional param odom_topic: string = "odom";
+    optional param goal_blackboard_id: string = "goal";
+    optional param path_blackboard_id: string = "path";
+    optional param goals_blackboard_id: string = "goals";
+    optional param waypoint_statuses_blackboard_id: string = "waypoint_statuses";
+    optional param error_code_name_prefixes: string[] = ["assisted_teleop", "backup", "compute_path", "dock_robot",
+                                                         "drive_on_heading", "follow_path", "nav_thru_poses", "nav_to_pose",
+                                                         "spin", "route", "undock_robot", "wait"]; # TODO: This is for Kilted or newer;
+    optional param error_code_names: string[] = ["compute_path_error_code", "follow_path_error_code"]; # TODO: Jazzy and older
+    optional param bond_heartbeat_period: Second = 0.1;
+    optional param allow_parameter_qos_overrides: bool = true;
+}
+
+plugin type navigate_to_pose {
+    optional param plugin: Plugin = default(NavigateToPose);
+}
+
+plugin type navigate_through_poses {
+    optional param plugin: Plugin = default(NavigateThroughPoses);
+}
+
+plugin type NavigateToPose {
+    optional param enable_groot_monitoring: bool = false;
+    optional param groot_server_port: int where {_ > 0} = 1668;
+}
+
+plugin type NavigateThroughPoses {
+    optional param enable_groot_monitoring: bool = false;
+    optional param groot_server_port: int where {_ > 0} = 1669;
+}

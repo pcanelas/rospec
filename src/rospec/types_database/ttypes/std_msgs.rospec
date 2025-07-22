@@ -7,3 +7,5 @@ message std_msgs/Header {
 message std_msgs/Float64 {
     field data: float64;
 }
+
+message std_msgs/Empty {}

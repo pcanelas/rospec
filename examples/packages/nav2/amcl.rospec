@@ -1,0 +1,119 @@
+type alias Natural: float32 where {_ >= 0};
+type alias Second: Natural;
+type alias Radian: float32;
+type alias Meter32: float32;
+
+policy instance sensor_data_profile: qos {
+    setting history     = KeepLast;
+    setting depth  		= 5;
+    setting reliability = BestEffort;
+    setting durability  = Volatile;
+    setting deadline = 0;
+    setting lifespan = 0;
+    setting liveliness = Automatic;
+    setting duration = 0;
+}
+
+policy instance transient_reliable_qos: qos {
+    setting history     = KeepLast;
+    setting depth       = 1;
+    setting reliability = Reliable;
+    setting durability  = TransientLocal;
+}
+
+message alias RestrictedLaserScan: sensor_msgs/LaserScan {
+    field header: std_msgs/Header;
+	field angle_min: Radian;
+    field angle_max: Radian;
+    field angle_increment: Radian;
+    field time_increment: Second;
+    field scan_time: Natural;
+    field range_min: Meter32;
+    field range_max: Meter32;
+    field ranges: float32[];
+    field intensities: float32[];
+} where {
+	angle_min < angle_max;
+    range_min < range_max;
+}
+
+node type amcl {
+    param robot_model_type: Enum[DifferentialMotionModel, OmniMotionModel];
+	param scan_topic: string;
+    param map_topic: string;
+
+	optional param alpha1: double = 0.2;
+	optional param alpha2: double = 0.2;
+	optional param alpha3: double = 0.2;
+	optional param alpha4: double = 0.2;
+	optional param alpha5: double = 0.2;
+    optional param base_frame_id: string = "base_footprint";
+    optional param beam_skip_distance: Natural = 0.5;
+    optional param beam_skip_error_threshold: double = 0.9;
+    optional param beam_skip_threshold: double = 0.3;
+    optional param do_beamskip: bool = false;
+    optional param global_frame_id: string = "map";
+    optional param lambda_short: double = 0.1;
+    optional param laser_likelihood_max_dist: double = 2.0;
+    optional param laser_max_range: double where {_ >= 0 or _ == -1} = 100.0;
+    optional param laser_min_range: double where {_ >= 0.0 or _ == -1.0} = -1.0;
+	optional param laser_model_type: Enum[Beam, LikelihoodField, LikelihoodFieldProb] = LikelihoodField;
+    optional param set_initial_pose: bool = false;
+    optional param initial_pose: geometry_msgs/Pose2D = geometry_msgs/Pose2D {
+    	x = 0.0,
+        y = 0.0,
+        z = 0.0,
+        yaw = 0.0,
+    };
+	optional param max_beams: int = 60;
+	optional param max_particles: int = 2000;
+    optional param min_particles: int = 500;
+    optional param odom_frame_id: string = "odom";
+    optional param pf_err: double = 0.05;
+    optional param pf_z: double = 0.99;
+    optional param recovery_alpha_fast: double = 0.0;
+    optional param recovery_alpha_slow: double = 0.0;
+    optional param resample_interval: Natural = 1;
+	optional param save_pose_rate: Natural = 0.5;
+    optional param sigma_hit: double = 0.2;
+    optional param tf_broadcast: bool = true;
+    optional param transform_tolerance: double = 1.0;
+    optional param update_min_a: double = 0.2;
+    optional param update_min_d: double = 0.25;
+    optional param z_hit: double = 0.5;
+    optional param z_max: double = 0.05;
+    optional param z_rand: double = 0.5;
+    optional param z_short: double = 0.005;
+    optional param always_reset_initial_pose: bool = false;
+    optional param first_map_only: string = false;
+    optional param bond_heartbeat_period: double = 0.1;
+
+    @qos{sensor_data_profile}
+    subscribes to content(scan_topic): RestrictedLaserScan;
+
+    @qos{sensor_data_profile}
+    publishes to particle_cloud: nav2_msgs/ParticleCloud;
+
+    @qos{transient_reliable_qos}
+    publishes to amcl_pose: geometry_msgs/PoseWithCovarianceStamped;
+
+    @qos{transient_reliable_qos}
+    subscribes to initialpose: geometry_msgs/PoseWithCovarianceStamped where {count(publishers(_)) == 1};
+
+    @qos{transient_reliable_qos}
+    subscribes to content(map_topic): nav_msgs/OccupancyGrid;
+
+    provides service reinitialize_global_localization: std_srvs/Empty;
+    provides service request_nomotion_srv: std_srvs/Empty;
+
+    broadcast map to odom;
+    broadcast odom to base_link;
+    broadcast base_link to scan;
+} where {
+	laser_min_range <= laser_max_range;
+    min_particles <= max_particles;
+    laser_model_type == Beam -> z_hit + z_max + z_rand + z_short == 1;
+    laser_model_type == LikelihoodField -> z_hit + z_rand == 1;
+	always_reset_initial_pose -> exists(initial_pose) and set_initial_pose;
+    set_initial_pose -> exists(initial_pose);
+}

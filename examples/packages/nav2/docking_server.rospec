@@ -1,0 +1,31 @@
+type alias Second: double where {_ >= 0};
+type alias Frequency: double where {_ > 0};
+type alias Meter: double where {_ >= 0};
+type alias IntNatural: int where {_ >= 0};
+type alias Radian: double;
+
+node type docking_server {
+    optional param controller_frequency: Frequency = 50.0;
+    optional param initial_perception_timeout: Second = 5.0;
+    optional param wait_charge_timeout: Second = 5.0;
+    optional param dock_approach_timeout: Second = 30.0;
+    optional param undock_linear_tolerance: Meter = 0.05;
+    optional param rotation_angular_tolerance: Radian = 0.05; # when rotate_to_dock is enabled
+    optional param max_retries: IntNatural = 3;
+    optional param base_frame: string = "base_link";
+    optional param fixed_frame: string = "odom";
+    optional param odom_topic: string = "odom";
+    optional param dock_backwards: bool = false; # This parameter is deprecated. Use the dock plugin’s dock_direction parameter instead.
+    optional param dock_prestaging_tolerance: double = 0.5;
+    optional param dock_plugins: Plugin[] = [];
+    optional param dock_database: string = "docks";
+    optional param docks: string[] = [];
+    optional param navigator_bt_xml: string = "";
+    optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
+    optional param allow_parameter_qos_overrides: bool = true;
+} where {
+    exists(docks) -> !exists(dock_database);
+    exists(dock_database) -> !exists(docks);
+}
+
+# TODO: Dockers e controller

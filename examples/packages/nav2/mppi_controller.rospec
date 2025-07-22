@@ -1,0 +1,144 @@
+type alias IntPositive: int where {_ >= 0};
+type alias Positive: double where {_ > 0.0};
+
+type alias Second: Positive;
+type alias Meter: Positive;
+
+type alias Radian: double;
+
+plugin type MPPIController {
+    optional param motion_model: Enum[DiffDrive, Omni, Ackermann] = DiffDrive;
+    optional param critics: Plugin[] = [];
+    optional param iteration_count: IntPositive = 1;
+    optional param batch_size: IntPositive = 1000;
+    optional param time_steps: IntPositive = 56;
+    optional param model_dt: Positive = 0.05;
+    optional param vx_std: double = 0.2;
+    optional param vy_std: double = 0.2;
+    optional param wz_std: double = 0.2;
+    optional param vx_max: double = 0.5;
+    optional param wz_max: double = 1.9;
+    optional param ax_max: double = 3.0;
+    optional param ay_min: double = -3.0;
+    optional param az_max: double = 3.5;
+    optional param temperature: double = 0.3;
+    optional param gamma: double = 0.015;
+    optional param visualize: bool = false; # TODO: controls if publish to debugging trajectories
+    optional param publish_optimal_trajectory: bool = false; # TODO: controls if publish to optimal trajectory topic
+    optional param retry_attempt_limit: IntPositive = 1;
+    optional param reset_period: Positive = 1.0;
+    optional param regenerate_noises: bool = false;
+    optional param plugin: Plugin = default(DefaultOptimalTrajectoryValidator);
+} where {
+    exists(ax_max) -> motion_model == Omni;
+    exists(ay_min) -> motion_model == Omni;
+}
+
+plugin type TrajectoryVisualizer {
+    optional param trajectory_step: IntPositive = 5;
+    optional param time_step: IntPositive = 3;
+}
+
+plugin type PathHandler {
+    optional param transform_tolerance: Second = 0.1;
+    optional param prune_distance: Meter = 1.5;
+    # optional param max_robot_pose_dist: Meter = costmap size / 2;...
+    optional param enforce_path_inversion: bool = false;
+    optional param inversion_xy_tolerance: Meter = 0.2;
+    optional param inversion_yaw_tolerance: double  = 0.4;
+    optional param allow_parameter_qos_overrides: bool = false;
+}
+
+plugin type AckermannConstraints {
+    optional param min_turning_r: Meter = 0.2;
+}
+
+plugin type DefaultOptimalTrajectoryValidator {
+    optional param collision_lookahead_time: Second = 2.0;
+    optional param consider_footprint: bool = false;
+}
+
+plugin type ConstraintCritic {
+    optional param cost_wight: double = 4.0;
+    optional param cost_power: int = 1;
+}
+
+plugin type GoalAngleCritic {
+    optional param cost_weight: double = 3.0;
+    optional param cost_power: int = 1;
+    optional param threshold_to_consider: Meter = 0.5;
+}
+
+plugin type GoalCritic {
+    optional param cost_weight: double = 5.0;
+    optional param cost_power: int = 1;
+    optional param threshold_to_consider: Meter = 1.4;
+}
+
+plugin type ObstaclesCritic {
+    optional param critical_weight: double = 20.0;
+    optional param repulsion_weight: double = 1.5;
+    optional param cost_power: int = 1;
+    optional param consider_footprint: bool = false;
+    optional param collision_cost: double = 100000.0;
+    optional param collision_margin_distance: Meter = 0.10;
+    optional param near_goal_distance: Meter = 0.5;
+    optional param cost_scaling_factor: double = 10.0;
+    optional param inflation_radius: Meter = 0.55;
+    optional param inflation_layer_name: string = "";
+}
+
+plugin type CostCritic {
+    optional param cost_weight: double = 3.81;
+    optional param cost_power: int = 1;
+    optional param consider_footprint: bool = false;
+    optional param collision_cost: double = 100000.0;
+    optional param near_collision_cost: int = 253;
+    optional param critical_cost: double = 300.0;
+    optional param near_goal_distance: Meter = 0.50;
+    optional param inflation_layer_name: string = "";
+    optional param trajectory_point_step: int = 2;
+}
+
+plugin type PathAlignCritic {
+    optional param cost_weight: double = 10.0;
+    optional param cost_power: int = 1;
+    optional param threshold_to_consider: Meter = 0.5;
+    optional param offset_from_furthest: IntPositive = 20;
+    optional param max_path_occupancy_ratio: double = 0.07;
+    optional param use_path_orientations: bool = false;
+    optional param trajectory_point_step: int = 4;
+}
+
+plugin type PathAngleCritic {
+    optional param cost_weight: double = 2.2;
+    optional param cost_power: int = 1;
+    optional param threshold_to_consider: Meter = 0.5;
+    optional param offset_from_furthest: Meter = 20;
+    optional param max_angle_to_furthest: Radian = 0.785398;
+    optional param mode: int where {_ >= 0 and _ <= 2} = 0;
+}
+
+plugin type PathFollowCritic {
+    optional param cost_weight: double = 5.0;
+    optional param cost_power: int = 1;
+    optional param threshold_to_consider: Meter = 1.4;
+    optional param offset_from_furthest: IntPositive = 6;
+}
+
+plugin type PreferForwardCritic {
+    optional param cost_weight: double = 5.0;
+    optional param cost_power: int = 1;
+    optional param threshold_to_consider: Meter = 0.5;
+}
+
+plugin type TwirlingCritic {
+    optional param cost_weight: double = 10.0;
+    optional param cost_power: int = 1;
+}
+
+plugin type VelocityDeadbandCritic {
+    optional param cost_weight: double = 35.0;
+    optional param cost_power: int = 1;
+    optional param deadband_velocities: double[] where {len(_) == 3 or len(_) == 0} = [0.05, 0.05, 0.05];
+}

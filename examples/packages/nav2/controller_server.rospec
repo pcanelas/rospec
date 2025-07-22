@@ -1,0 +1,98 @@
+type alias Radian: double;
+type alias Hertz: double;
+type alias Meter: double where {_ >= 0.0};
+type alias Second: double where {_ >= 0.0};
+
+type alias MeterPerSecond: double;
+type alias RadianPerSecond: double;
+
+node type controller_server {
+    optional param controller_frequency: Hertz = 20.0;
+    optional param costmap_update_timeout: Second = 0.3;
+    optional param use_realtime_priority: bool = false;
+    optional param publish_zero_velocity: bool = true;
+    optional param controller_plugins: Plugin[] = [default(FollowPath)];
+    optional param progress_checker_plugins: Plugin[] = [default(progress_checker)];
+    optional param goal_checker_plugins: Plugin[] = [default(goal_checker)];
+    optional param min_x_velocity_threshold: MeterPerSecond where {_ >= 0.0} = 0.0001;
+    optional param min_y_velocity_threshold: MeterPerSecond where {_ >= 0.0} = 0.0001; # TODO: for non-holonomic robots
+    optional param min_theta_velocity_threshold: double where {_ >= 0.0} = 0.0001;
+    optional param failure_tolerance: double where {_ >= 0.0 or _ == -1.0} = 0.0;
+    optional param speed_limit_topic: string = "speed_limit";
+    optional param odom_topic: string = "odom";
+    optional param enable_stamped_cmd_vel: bool = true;
+    optional param bond_heartbeat_period: Second = 0.1;
+    optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
+    optional param allow_parameter_qos_overrides: bool = true;
+}
+
+plugin type FollowPath {
+
+}
+
+plugin type progress_checker {
+    optional param plugin: Plugin = default(SimpleProgressChecker);
+}
+
+plugin type goal_checker {
+    optional param plugin: Plugin = default(SimpleGoalChecker);
+}
+
+plugin type SimpleProgressChecker {
+    optional param required_movement_radius: Meter = 0.5;
+    optional param movement_time_allowance: Second = 0.5;
+}
+
+plugin type PoseProgressChecker {
+    optional param required_movement_radius: Meter = 0.5;
+    optional param required_movement_angle: Radian = 0.5;
+    optional param movement_time_allowance: Second = 10.0;
+}
+
+plugin type SimpleGoalChecker {
+    optional param xy_goal_tolerance: Meter = 0.25;
+    optional param yaw_goal_tolerance: Radian = 0.25;
+    optional param stateful: bool = true;
+}
+
+plugin type StoppedGoalChecker {
+    optional param trans_stopped_velocity: MeterPerSecond = 0.25;
+    optional param rot_stopped_velocity: RadianPerSecond = 0.25;
+    optional param xy_goal_tolerance: Meter = 0.25;
+    optional param yaw_goal_tolerance: Radian = 0.25;
+    optional param stateful: bool = true;
+}
+
+plugin type PositionGoalChecker {
+    optional param xy_goal_tolerance: Meter = 0.25;
+    optional param stateful: bool = true;
+}
+
+plugin type SmacPlannerLattice {
+    optional param allow_unknown: bool = true;
+    optional param tolerance: double = 0.25;
+    optional param max_iterations: int where {_ >= 0 or _ == -1} = 1000000;
+    optional param max_on_approach_iterations: int where {_ >= 0} = 1000;
+    optional param terminal_checking_interval: int where {_ >= 0} = 5000;
+    optional param max_planning_time: Second = 5.0;
+    optional param analytic_expansion_ration: double = 3.5;
+    optional param analytic_expansion_max_length: Meter = 3.0;
+    optional param analytic_expansion_max_cost: double = 200.0;
+    optional param analytic_expansion_max_cost_override: bool = false;
+    optional param reverse_penalty: double = 2.0;
+    optional param cost_penalty: double = 2.0;
+    optional param rotation_penalty: double = 5.0;
+    optional param retrospective_penalty: double where {_ >= 0.0 and _ <= 1.0} = 0.015;
+    optional param lattice_filepath: string = "";
+    optional param cache_obstacle_heuristic: bool = false;
+    optional param lookup_table_size: Meter = 20.0;
+    optional param allow_reverse_expansion: bool = false;
+    optional param debug_visualizations: bool = false;
+    optional param smooth_lattice_filepath: string = "";
+    # Smoother params are missing
+    optional param goal_heading_mode: Enum[DEFAULT, BIDIRECTIONAL, ALL_DIRECTION] = DEFAULT;
+    optional param coarse_search_resolution: string = "1"; # This should be an int....
+    optional param allow_parameter_qos_overrides: bool = true;
+} where {
+    exists(reverse_penalty) -> allow_reverse_expansion;
+}

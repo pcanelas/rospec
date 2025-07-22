@@ -1,0 +1,173 @@
+type alias Meter: double where {_ >= 0.0};
+type alias Second: double where {_ >= 0.0};
+type alias IntMeter: int where {_ >= 0};
+type alias Hertz: double where {_ >= 0.0};
+type alias Percentage: double where {_ >= 0.0 and _ <= 1.0};
+
+node type global_costmap {
+    optional param always_send_full_costmap: bool = false;
+    optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
+    optional param allow_parameter_qos_overrides: bool = true;
+    optional param footprint_padding: Meter = 0.01;
+    optional param footprint: double[] = [];
+    optional param global_frame: string = "map";
+    optional param height: IntMeter = 5;
+    optional param width: IntMeter = 5;
+    optional param lethal_cost_threshold: int where {_ >= 0.0} = 100;
+    optional param map_vis_z: double = 0.0;
+    optional param observation_sources: string = "";
+    optional param origin_x: Meter = 0.0;
+    optional param origin_y: Meter = 0.0;
+    optional param publish_frequency: Hertz = 1.0;
+    optional param resolution: Meter = 0.1;
+    optional param robot_base_frame: string = "base_link";
+    optional param robot_radius: Meter = 0.1;
+    optional param subscribe_to_stamped_footprint: bool = false;
+    optional param rolling_window: bool = false;
+    optional param track_unknown_space: bool = false;
+    optional param transform_tolerance: double where {_ >= 0.0} = 0.3;
+    optional param initial_transform_timeout: Second = 60.0;
+    optional param trinary_costmap: bool = true;
+    optional param unknown_cost_value: int = 255;
+    optional param update_frequency: Hertz = 5.0;
+    optional param use_maximum: bool = false;
+    optional param plugins: Plugin[] = [default(static_layer),
+                                        default(obstacle_layer),
+                                        default(inflation_layer)];
+    optional param filters: Plugin[] = [];
+} where {
+    exists(robot_radius) -> !exists(footprint);
+}
+
+plugin type static_layer {
+    optional param plugin: Plugin = default(StaticLayer);
+
+}
+
+plugin type obstacle_layer {
+    optional param plugin: Plugin = default(ObstacleLayer);
+
+}
+
+plugin type inflation_layer {
+    optional param plugin: Plugin = default(InflationLayer);
+
+}
+
+plugin type voxel_layer {
+    optional param plugin: Plugin = default(VoxelLayer);
+
+}
+
+plugin type range_sensor {
+    optional param plugin: Plugin = default(RangeSensor);
+
+}
+
+plugin type denoise_layer {
+    optional param plugin: Plugin = default(DenoiseLayer);
+
+}
+
+plugin type StaticLayer {
+    optional param enabled: bool = true;
+    optional param footprint_clearing_enabled: bool = false;
+    optional param restore_cleared_footprint: bool = true;
+    optional param subscribe_to_updates: bool = false;
+    optional param map_subscribe_transient_local: bool = true;
+    optional param transform_tolerance: double where {_ >= 0.0} = 0.0;
+    optional param map_topic: string = "map";
+} where {
+    exists(subscribe_to_updates) -> !footprint_clearing_enabled;
+}
+
+plugin type InflationLayer {
+    optional param enabled: bool = true;
+    optional param inflation_radius: double = 0.55;
+    optional param cost_scaling_factor: double = 10.0;
+    optional param inflate_unknown: bool = false;
+    optional param inflate_around_unknown: bool = false;
+}
+
+plugin type ObstacleLayer {
+    optional param enabled: bool = true;
+    optional param footprint_clearing_enabled: bool = true;
+    optional param max_obstacle_height: double where {_ >= 0.0} = 2.0;
+    optional param combination_method: int where {_ >= 0 and _ <= 2} = 1;
+    optional param tf_filter_tolerance: double where {_ >= 0.0} = 0.05;
+    optional param observation_sources: string[] = [];
+    # missing data source
+} where {
+    exists(observation_sources) -> !track_unknown_space;
+}
+
+plugin type VoxelLayer {
+    optional param enabled: bool = true;
+    optional param footprint_clearing_enabled: bool = true;
+    optional param max_obstacle_height: double where {_ >= 0.0} = 2.0;
+    optional param z_voxels: int where {_ >= 0 and _ <= 16} = 10;
+    optional param origin_z: Meter = 0.0;
+    optional param z_resolution: Meter = 0.2;
+    optional param unknown_threshold: int where {_ >= 0} = 0;
+    optional param mark_threshold: int where {_ >= 0} = 0;
+    optional param combination_method: int where {_ >= 0 and _ <= 2} = 1;
+    optional param publish_voxel_map: bool = false;
+    optional param tf_filter_tolerance: double where {_ >= 0.0} = 0.05;
+    optional param observation_sources: string[] = [];
+}
+
+plugin type RangeSensor {
+    optional param enabled: bool = true;
+    optional param topics: string[] = [];
+    optional param phi: double where {_ >= 0.0} = 1.2;
+    optional param inflate_cone: Percentage = 1.0;
+    optional param no_readings_timeout: Second = 0.0;
+    optional param clear_threshold: double where {_ >= 0.0} = 0.2;
+    optional param mark_threshold: double where {_ >= 0.0} = 0.8;
+    optional param clear_on_max_reading: bool = false;
+    optional param input_sensor_type: Enum[ALL, VARIABLE, FIXED] = ALL;
+}
+
+plugin type DenoiseLayer {
+    optional param enabled: bool = true;
+    optional param minimal_group_size: int = 2;
+    optional param group_connectivity_type: int where {_ == 4 or _ == 8} = 8;
+}
+
+plugin type keepout_filter {
+    optional param plugin: Plugin = default(KeepoutFilter);
+
+}
+
+plugin type speed_filter {
+    optional param plugin: Plugin = default(SpeedFilter);
+
+}
+
+plugin type binary_filter {
+    optional param plugin: Plugin = default(BinaryFilter);
+
+}
+
+plugin type KeepoutFilter {
+    optional param enabled: bool = true;
+    optional param filter_info_topic: string = "";
+    optional param transform_tolerance: Second = 0.1;
+}
+
+
+plugin type SpeedFilter {
+    optional param enabled: bool = true;
+    optional param filter_info_topic: string = "";
+    optional param speed_limit_topic: string = "speed_limit";
+    optional param transform_tolerance: Second = 0.1;
+}
+
+plugin type BinaryFilter {
+    optional param enabled: bool = true;
+    optional param filter_info_topic: string = "";
+    optional param transform_tolerance: Second = 0.1;
+    optional param default_state: bool = false;
+    optional param binary_state_topic: string = "binary_state";
+    optional param flip_threshold: double where {_ >= 0.0} = 50.0;
+}

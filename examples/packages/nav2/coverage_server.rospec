@@ -1,0 +1,25 @@
+type alias Meter: double where {_ >= 0.0};
+
+node type coverage_server {
+    optional param coordinates_in_cartesian_frame: bool = true;
+    optional param robot_width: Meter = 2.1;
+    optional param operation_width: Meter = 2.5;
+    optional param min_turning_radius: Meter = 0.4;
+    optional param linear_curv_change: double = 2.0;
+    optional param default_allow_overlap: bool = false;
+    optional param default_headland_type: string where {_ == "CONSTANT"} = "CONSTANT";
+    optional param default_headland_width: Meter = 2.0;
+    optional param default_swath_type: Enum[LENGTH, COVERAGE, NUMBER] = LENGTH; # use opennav_coverage
+    optional param default_swath_angle_type: Enum[BRUTE_FORCE, SET_ANGLE] = BRUTE_FORCE; # ??
+    optional param default_swath_angle: double = 0.017;
+    optional param default_route_type: Enum[BOUSTROPHEDON, SNAKE, SPIRAL, CUSTOM] = BOUSTROPHEDON;
+    optional param default_custom_order: int[] = [];
+    optional param default_spiral_n: int = 4;
+    optional param default_path_type: Enum[DUBIN, REEDS_SHEPP] = DUBIN;
+    optional param default_turn_point_distance: Meter = 0.1;
+    optional param default_offset: double where {_ >= 0.0} = 0.0;
+    optional param order_ids: bool = false;
+} where {
+    exists(default_custom_order) -> default_route_type == CUSTOM;
+    exists(default_spiral_n) -> (default_route_type == SPIRAL or (default_route_type == SNAKE and default_spiral_n == 2));
+}

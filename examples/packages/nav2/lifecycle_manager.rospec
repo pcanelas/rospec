@@ -1,0 +1,11 @@
+type alias Second: double where {_ >= 0.0};
+
+node type lifecycle_manager {
+    optional param node_names: string[] = [];
+    optional param autostart: bool = false;
+    optional param bond_timeout: double where {_ >= 0.0} = 4.0;
+    optional param attempt_respawn_reconnection: bool = true;
+    optional param bond_respawn_max_duration: Second = 10.0;
+    optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
+    optional param allow_parameter_qos_overrides: bool = true;
+}

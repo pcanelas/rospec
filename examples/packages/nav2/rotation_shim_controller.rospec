@@ -1,0 +1,21 @@
+type alias Radian: double;
+type alias RadianPerSecond: double;
+type alias RadianPerSecondSecond: double;
+type alias Meter: double where {_ >= 0.0};
+type alias Second: double where {_ >= 0.0};
+
+plugin type RotationShimController {
+    optional param angular_dist_threshold: Radian = 0.785;
+    optional param angular_disengage_threshold: Radian = 0.3925;
+    optional param forward_sampling_distance: Meter = 0.5;
+    optional param rotate_to_heading_angular_vel: RadianPerSecond = 1.8;
+
+    param primary_controller: Plugin;
+
+    optional param max_angular_accel: RadianPerSecondSecond = 3.2;
+    optional param simulate_ahead_time: Second = 1.0;
+    optional param rotate_to_goal_heading: bool = false;
+    optional param rotate_to_heading_once: bool = false;
+    optional param closed_loop: bool = false;
+    optional param use_path_orientations: bool = false;
+}

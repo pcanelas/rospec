@@ -1,0 +1,18 @@
+type alias Hertz: double where {_ > 0.0};
+type alias Second: double where {_ >= 0.0};
+type alias Radian: double;
+
+node type navsat_transform_node {
+    param magnetic_declination_radians: Radian; # Source-code documentation says that this parameter is mandatory
+
+    optional param frequency: Hertz = 30.0;
+    optional param delay: Second = 0.0;
+    optional param yaw_offset: Radian = 0.0; # TODO: Context variable to check if yaw faces east
+    optional param zero_altitude: bool = false;
+    optional param publish_filtered_gps: bool = false;
+    optional param broadcast_utm_transform: bool = false;
+    optional param use_odometry_yaw: bool = false;
+    optional param wait_for_datum: bool = false;
+    optional param broadcast_utm_transform_as_parent_frame: bool = false;
+    optional param transform_timeout: Second = 0.0;
+}

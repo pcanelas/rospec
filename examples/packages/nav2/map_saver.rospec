@@ -1,0 +1,9 @@
+type alias Second : double where {_ >= 0.0};
+type alias Probability : double where {_ >= 0.0 and _ <= 1.0};
+
+node type map_saver {
+    optional param save_map_timeout: Second = 2.0;
+    optional param free_thresh_default: Probability = 0.25;
+    optional param occupied_thresh_default: Probability = 0.65;
+    optional param introspection_mode: Enum[Disabled, Metadata, Contents] = Disabled;
+}

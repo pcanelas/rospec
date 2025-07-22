@@ -1,0 +1,5 @@
+node type savitzky_golay_smoother {
+    optional param do_refine: bool = true;
+    optional param refinement_num: int where {_ >= 0} = 2;
+    optional param enforce_path_inversion: bool = true;
+}
