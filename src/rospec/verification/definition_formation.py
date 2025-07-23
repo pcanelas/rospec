@@ -45,7 +45,7 @@ from rospec.verification.substitution import (
 from rospec.verification.subtyping import is_subtype
 from rospec.verification.type_formation import ty_formation
 from rospec.verification.utils import convert_to_expression, check_policies
-from rospec.language import errors
+from rospec import errors
 
 
 def d_type_alias(context: Context, ty_alias: TypeAlias) -> Context:
@@ -66,23 +66,21 @@ def d_message_alias(context: Context, msg_alias: MessageAlias) -> Context:
     assert isinstance(msg_alias.new_ttype, BasicType)
 
     # Ensure that the set of fields in msg_alias.fields is exactly the same as the set of fields in old_ty_struct
-    if not set([f.identifier.name for f in msg_alias.fields]) == set(old_ty_struct.fields.keys()):
-        context = context.add_error(
-            errors.FIELDS_MISMATCH.format(
-                fields=[f.identifier.name for f in msg_alias.fields], expected_fields=list(old_ty_struct.fields.keys())
-            )
-        )
-
-    # Ensure that the type of each field in msg_alias.fields is subtype of the corresponding in old_ty_struct
     for field in msg_alias.fields:
-        # TODO: field.identifier.name may not be in old_ty_struct
-        field_ttype = old_ty_struct.fields[field.identifier.name]
-        if not is_subtype(context, field.ttype, field_ttype):
+        if field.identifier.name not in old_ty_struct.fields:
             context = context.add_error(
-                errors.FIELD_NOT_SUBTYPE.format(
-                    field=field.identifier.name, ttype=field.ttype, expected_type=field_ttype
+                errors.MESSAGE_FIELD_ERROR.format(
+                    field=field.identifier.name, ttype=field.ttype, expected_type=msg_alias.old_ttype
                 )
             )
+        else:
+            field_ttype = old_ty_struct.fields[field.identifier.name]
+            if not is_subtype(context, field.ttype, field_ttype):
+                context = context.add_error(
+                    errors.MESSAGE_FIELD_NOT_SUBTYPE.format(
+                        field=field.identifier.name, ttype=field.ttype, expected_type=field_ttype
+                    )
+                )
 
     # TODO: The dependencies can only be checked at execution time, that is for future work.
 
@@ -93,23 +91,36 @@ def d_message_alias(context: Context, msg_alias: MessageAlias) -> Context:
 
 
 def d_policy_instance(context: Context, policy_instance: PolicyInstance) -> Context:
-    assert policy_instance.policy_name not in context.typing  # The policy name should not already exist
+    # The policy name should not already exist
+    assert policy_instance.policy_name not in context.typing, errors.POLICY_ALREADY_DEFINED.format(
+        policy=policy_instance.policy_name.name
+    )
+    # TODO: This is not correct, we need to check if the policy is already defined
 
     policy_struct: TType = context.get_typing(policy_instance.policy_name.name)
-    assert isinstance(policy_struct, StructType)
+    assert isinstance(policy_struct, StructType), errors.POLICY_NOT_STRUCT.format(
+        policy=policy_instance.policy_name.name
+    )
 
     # Ensure that all the fields in the policy instance exist in the structure and are well formed
     for parameter in policy_instance.parameters:
         if parameter.identifier.name not in policy_struct.fields:
             context = context.add_error(
-                errors.FIELD_NOT_FOUND.format(field=parameter.identifier.name, fields=list(policy_struct.fields.keys()))
+                errors.POLICY_FIELD_NOT_FOUND.format(
+                    field=parameter.identifier.name,
+                    policy_type=policy_instance.policy_name.name,
+                    fields=list(policy_struct.fields.keys()),
+                )
             )
         else:
-            parameter_ttype = selfification(parameter.value, name=parameter.identifier.name)
+            parameter_ttype: RefinedType = selfification(parameter.value, name=parameter.identifier.name)
+            # TODO: This is not working correctly, if the value is incorrect, it does not raise an error
             if not is_subtype(context, parameter_ttype, policy_struct.fields[parameter.identifier.name]):
                 context = context.add_error(
-                    errors.FIELD_NOT_SUBTYPE_POLICY.format(
-                        field=parameter.identifier.name, expected_type=policy_struct.fields[parameter.identifier.name]
+                    errors.POLICY_FIELD_NOT_SUBTYPE.format(
+                        field=parameter.identifier.name,
+                        value=parameter.value,
+                        ttype=policy_struct.fields[parameter.identifier.name],
                     )
                 )
 
@@ -142,7 +153,9 @@ def d_node_type(context: Context, node_type: NodeType) -> Context:
             if isinstance(config_ty.default_value, Literal) and isinstance(new_ttype_replaced, RefinedType):
                 if not interpret(context=context, expr=new_ttype_replaced.refinement):
                     context.add_error(
-                        f"Refinement {new_ttype_replaced.refinement} not satisfied in {config_ty.default_value}"
+                        errors.PARAMETER_DEFAULT_INVALID.format(
+                            value=config_ty.default_value, parameter=config_string, ttype=config_ty.ttype
+                        )
                     )
 
     connections: list[Union[Publisher, Subscriber, Service, Action, TFTransform]] = []

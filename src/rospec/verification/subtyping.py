@@ -19,7 +19,7 @@ from rospec.language.ttypes import (
 from rospec.verification.context import Context
 from rospec.verification.interpreter import interpret
 from rospec.verification.substitution import inverse_substitution_expr_expr
-from rospec.language import errors
+from rospec import errors
 
 
 def is_subtype_refined(context: Context, t: TType, u: TType) -> bool:

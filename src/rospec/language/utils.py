@@ -23,7 +23,6 @@ from rospec.language.ttypes import (
     TType,
     EnumType,
     t_bool_bool_bool,
-    t_bottom,
 )
 
 
@@ -80,16 +79,16 @@ def infer_qos_type(identifier: Identifier) -> TType:
     name = identifier.name
     dispatcher = {
         "history": EnumType(
-            ttypes=[Identifier(name="KeepLast", ttype=t_bottom), Identifier(name="KeepAll", ttype=t_bottom)]
+            ttypes=[Identifier(name="KeepLast", ttype=t_string), Identifier(name="KeepAll", ttype=t_string)]
         ),
         "reliability": EnumType(
-            ttypes=[Identifier(name="Reliable", ttype=t_bottom), Identifier(name="BestEffort", ttype=t_bottom)]
+            ttypes=[Identifier(name="Reliable", ttype=t_string), Identifier(name="BestEffort", ttype=t_string)]
         ),
         "durability": EnumType(
-            ttypes=[Identifier(name="TransientLocal", ttype=t_bottom), Identifier(name="Volatile", ttype=t_bottom)]
+            ttypes=[Identifier(name="TransientLocal", ttype=t_string), Identifier(name="Volatile", ttype=t_string)]
         ),
         "liveliness": EnumType(
-            ttypes=[Identifier(name="Automatic", ttype=t_bottom), Identifier(name="Manual", ttype=t_bottom)]
+            ttypes=[Identifier(name="Automatic", ttype=t_string), Identifier(name="Manual", ttype=t_string)]
         ),
         "depth": t_int,
         "deadline": t_double,
@@ -97,8 +96,8 @@ def infer_qos_type(identifier: Identifier) -> TType:
         "duration": t_double,
         "format": EnumType(
             ttypes=[
-                Identifier(name="RGB8", ttype=t_bottom),
-                Identifier(name="Grayscale", ttype=t_bottom),
+                Identifier(name="RGB8", ttype=t_string),
+                Identifier(name="Grayscale", ttype=t_string),
             ]
         ),
     }

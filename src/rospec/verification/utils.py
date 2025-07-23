@@ -32,7 +32,7 @@ from rospec.language.ttypes import (
 from rospec.verification.context import Context
 from rospec.verification.interpreter import interpret
 from rospec.verification.subtyping import is_subtype
-from rospec.language import errors
+from rospec import errors
 
 
 def wrap_equals(identifier: Identifier, value: Expression) -> FunctionCall:

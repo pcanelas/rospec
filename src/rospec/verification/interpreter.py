@@ -19,7 +19,7 @@ from rospec.language.nodes import (
 )
 from rospec.language.ttypes import OptionalType, t_bottom
 from rospec.verification.context import Context
-from rospec.language import errors
+from rospec import errors
 
 evaluation_context = {
     # Arithmetic operations

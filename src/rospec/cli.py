@@ -10,6 +10,8 @@ from rospec.types_database.ttypes_loader import get_ros_types, get_native_types
 from rospec.verification.context import Context
 from rospec.verification.definition_formation import program_formation
 
+from rospec import errors
+
 
 def process_errors(errors: list[str], output: str) -> None:
     """
@@ -51,10 +53,10 @@ def merge_specifications(specifications: list[str]) -> str:
                 merged_specification += f.read() + "\n"
                 logger.info(f"Successfully read specification from {spec}")
         except FileNotFoundError:
-            logger.error(f"Specification file {spec} not found.")
+            logger.error(errors.SPEC_FILE_NOT_FOUND.format(spec=spec))
             sys.exit(1)
         except Exception as e:
-            logger.error(f"An error occurred while reading {spec}: {str(e)}")
+            logger.error(errors.SPEC_READ_ERROR.format(spec=spec, error=str(e)))
             sys.exit(1)
     return merged_specification
 
@@ -81,7 +83,9 @@ def main(args: Optional[list[str]] = None) -> None:
     program: str = merge_specifications(args.specifications)
     parsed_program: Program = parse_program(program)
     context: Context = load_context()
-    errors: list[str] = verify_program(context, parsed_program)
+    errors: list[str] = verify_program(
+        context, parsed_program
+    )  # TODO: There may be errors raised, we need to capture and print them
     process_errors(errors, args.output)
 
 

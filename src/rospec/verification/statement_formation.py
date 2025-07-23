@@ -17,6 +17,7 @@ from rospec.language.ttypes import TType, OptionalType
 from rospec.verification.context import Context
 from rospec.verification.expression_formation import expr_formation
 from rospec.verification.type_formation import ty_formation
+from rospec import errors
 
 
 # It includes: spd_param, spd_arg, spd_ctx, spd_field, spd_setting
@@ -59,9 +60,13 @@ def s_connection(
 
 def s_frame(context: Context, frame: TFTransform) -> TFTransform:
     if isinstance(frame.parent_frame, Identifier):
-        assert frame.parent_frame.name not in context.typing
+        assert frame.parent_frame.name not in context.typing, errors.VARIABLE_ALREADY_EXISTS.format(
+            variable=frame.parent_frame.name, ttype=context.get_typing(frame.parent_frame.name)
+        )
     if isinstance(frame.child_frame, Identifier):
-        assert frame.child_frame.name not in context.typing
+        assert frame.child_frame.name not in context.typing, errors.VARIABLE_ALREADY_EXISTS.format(
+            variable=frame.child_frame.name, ttype=context.get_typing(frame.child_frame.name)
+        )
     return frame
 
 
@@ -81,4 +86,4 @@ def st_formation(context: Context, st: Statement) -> Any:
         return s_connection(context, st)
     elif isinstance(st, TFTransform):
         return s_frame(context, st)
-    assert False, f"Unknown statement type: {st}"
+    assert False, errors.STATEMENT_NOT_RECOGNIZED.format(statement=st)
