@@ -19,6 +19,7 @@ from rospec.language.ttypes import (
 from rospec.verification.context import Context
 from rospec.verification.interpreter import interpret
 from rospec.verification.substitution import inverse_substitution_expr_expr
+from rospec.language import errors
 
 
 def is_subtype_refined(context: Context, t: TType, u: TType) -> bool:
@@ -39,7 +40,7 @@ def is_subtype_refined(context: Context, t: TType, u: TType) -> bool:
         is_satisfied = interpret(context, new_expr)
         assert isinstance(is_satisfied, bool)
         if not is_satisfied:
-            context.add_error(f"Refinement {t.refinement} not satisfied in {u}")
+            context.add_error(errors.REFINEMENT_NOT_SATISFIED.format(refinement=t.refinement, context=u))
 
         return is_satisfied
 
@@ -71,14 +72,14 @@ def is_subtype_struct(context: Context, t: StructType, u: StructType) -> bool:
     result = True
     for key in t.fields.keys():
         if key not in u.fields:
-            context.add_error(f">> Struct {t} is not a subtype of {u}, because the field {key} is not present in {u}")
+            context.add_error(errors.STRUCT_FIELD_MISSING.format(t=t, u=u, key=key))
             result = False
 
     # ##################################################################################################################
     # PROPERTY: ALL NON-OPTIONAL VALUES IN u MUST EXIST IN t
     for u_key, u_value in u.fields.items():
         if not isinstance(u_value, OptionalType) and u_key not in t.fields:
-            context.add_error(f"Struct {t} is not a subtype of {u}, because the field {u_key} is not present in {t}")
+            context.add_error(errors.STRUCT_FIELD_EXTRA.format(t=t, u=u, key=u_key))
             result = False
 
     # ##################################################################################################################
@@ -87,7 +88,7 @@ def is_subtype_struct(context: Context, t: StructType, u: StructType) -> bool:
         if t_key in u.fields:
             u_value = u.fields[t_key]
             if not is_subtype(context, t_value, u_value):
-                context.add_error(f"{t_key} has type {t_value} and is not subtype of {u_value}")
+                context.add_error(errors.FIELD_TYPE_MISMATCH.format(key=t_key, t_value=t_value, u_value=u_value))
                 result = False
 
     return result
