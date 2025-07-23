@@ -45,6 +45,7 @@ from rospec.verification.substitution import (
 from rospec.verification.subtyping import is_subtype
 from rospec.verification.type_formation import ty_formation
 from rospec.verification.utils import convert_to_expression, check_policies
+from rospec.language import errors
 
 
 def d_type_alias(context: Context, ty_alias: TypeAlias) -> Context:
@@ -67,7 +68,9 @@ def d_message_alias(context: Context, msg_alias: MessageAlias) -> Context:
     # Ensure that the set of fields in msg_alias.fields is exactly the same as the set of fields in old_ty_struct
     if not set([f.identifier.name for f in msg_alias.fields]) == set(old_ty_struct.fields.keys()):
         context = context.add_error(
-            f"Fields in {[f.identifier.name for f in msg_alias.fields]} do not match {old_ty_struct.fields.keys()}"
+            errors.FIELDS_MISMATCH.format(
+                fields=[f.identifier.name for f in msg_alias.fields], expected_fields=list(old_ty_struct.fields.keys())
+            )
         )
 
     # Ensure that the type of each field in msg_alias.fields is subtype of the corresponding in old_ty_struct
@@ -76,7 +79,9 @@ def d_message_alias(context: Context, msg_alias: MessageAlias) -> Context:
         field_ttype = old_ty_struct.fields[field.identifier.name]
         if not is_subtype(context, field.ttype, field_ttype):
             context = context.add_error(
-                f"Field {field.identifier.name} : {field.ttype} is not a subtype of {field_ttype}"
+                errors.FIELD_NOT_SUBTYPE.format(
+                    field=field.identifier.name, ttype=field.ttype, expected_type=field_ttype
+                )
             )
 
     # TODO: The dependencies can only be checked at execution time, that is for future work.
@@ -96,13 +101,16 @@ def d_policy_instance(context: Context, policy_instance: PolicyInstance) -> Cont
     # Ensure that all the fields in the policy instance exist in the structure and are well formed
     for parameter in policy_instance.parameters:
         if parameter.identifier.name not in policy_struct.fields:
-            context = context.add_error(f"Field {parameter.identifier.name} not found in {policy_struct.fields}")
+            context = context.add_error(
+                errors.FIELD_NOT_FOUND.format(field=parameter.identifier.name, fields=list(policy_struct.fields.keys()))
+            )
         else:
             parameter_ttype = selfification(parameter.value, name=parameter.identifier.name)
             if not is_subtype(context, parameter_ttype, policy_struct.fields[parameter.identifier.name]):
-                policy_field_ttype = policy_struct.fields[parameter.identifier.name]
                 context = context.add_error(
-                    f"Field {parameter.identifier.name} is not a subtype of {policy_field_ttype}"
+                    errors.FIELD_NOT_SUBTYPE_POLICY.format(
+                        field=parameter.identifier.name, expected_type=policy_struct.fields[parameter.identifier.name]
+                    )
                 )
 
     # Create the new struct type and add it to the context
@@ -218,7 +226,9 @@ def d_node_instance(context: Context, node_instance: NodeInstance) -> Context:
 
     if not is_subtype(internal_context, node_instance_struct, x2_node_type.fields):
         context = context.add_error(
-            f"Node instance {node_instance.name.name} is not subtype of {x2_node_type} where {node_instance_struct}"
+            errors.NODE_INSTANCE_NOT_SUBTYPE.format(
+                name=node_instance.name.name, type=x2_node_type, struct=node_instance_struct
+            )
         )
 
     # ##################################################################################################################
@@ -249,7 +259,9 @@ def d_node_instance(context: Context, node_instance: NodeInstance) -> Context:
     # PROPERTY: ALL DEPENDENCIES MUST BE SATISFIED
     if dependency is not None:
         if not interpret(internal_context, dependency):
-            context = context.add_error(f"Dependency {dependency} not satisfied in {node_instance.name.name}")
+            context = context.add_error(
+                errors.DEPENDENCY_NOT_SATISFIED.format(dependency=dependency, name=node_instance.name.name)
+            )
     # ##################################################################################################################
 
     result_connections: list[Union[Publisher, Subscriber, Service, Action, TFTransform]] = copy.deepcopy(
@@ -385,7 +397,9 @@ def d_plugin_instance(context: Context, plugin_instance: PluginInstance):
 
     if not is_subtype(internal_context, plugin_instance_st, x2_plugin_type.fields):
         context = context.add_error(
-            f"Plugin instance {plugin_instance.name.name} is not subtype of {x2_plugin_type} where {plugin_instance_st}"
+            errors.PLUGIN_INSTANCE_NOT_SUBTYPE.format(
+                name=plugin_instance.name.name, type=x2_plugin_type, struct=plugin_instance_st
+            )
         )
 
     # ##################################################################################################################
@@ -416,7 +430,9 @@ def d_plugin_instance(context: Context, plugin_instance: PluginInstance):
     # PROPERTY: ALL DEPENDENCIES MUST BE SATISFIED
     if dependency is not None:
         if not interpret(internal_context, dependency):
-            context = context.add_error(f"Dependency {dependency} not satisfied in {plugin_instance.name.name}")
+            context = context.add_error(
+                errors.DEPENDENCY_NOT_SATISFIED.format(dependency=dependency, name=plugin_instance.name.name)
+            )
     # ##################################################################################################################
 
     result_connections: list[Union[Publisher, Subscriber, Service, Action]] = copy.deepcopy(x2_plugin_type.connections)
@@ -466,18 +482,22 @@ def d_system(context: Context, system: System) -> Context:
             if isinstance(connection.topic.ttype, RefinedType):
                 if not interpret(context, connection.topic.ttype.refinement):
                     context = context.add_error(
-                        f"Refinement {connection.topic.ttype.refinement} not satisfied in {connection.topic.ttype}"
+                        errors.REFINEMENT_NOT_SATISFIED.format(
+                            refinement=connection.topic.ttype.refinement, context=connection.topic.ttype
+                        )
                     )
             else:
                 pub_connections = interpret_connection(context, connection.topic, Publisher)
 
                 if len(pub_connections) == 0:
-                    context = context.add_error(f"Publisher not found for subscriber {connection.topic}")
+                    context = context.add_error(errors.PUBLISHER_NOT_FOUND.format(topic=connection.topic))
 
                 for conn2 in pub_connections:
                     if not is_subtype(context, conn2.topic.ttype, connection.topic.ttype):
                         context = context.add_error(
-                            f"Subscriber {connection.topic} is not a subtype of {conn2.topic.ttype}"
+                            errors.FIELD_NOT_SUBTYPE.format(
+                                field=connection.topic, ttype=connection.topic.ttype, expected_type=conn2.topic.ttype
+                            )
                         )
 
                     # ##################################################################################################
@@ -488,7 +508,9 @@ def d_system(context: Context, system: System) -> Context:
             if isinstance(connection.topic.ttype, RefinedType):
                 if not interpret(context, connection.topic.ttype.refinement):
                     context = context.add_error(
-                        f"Refinement {connection.topic.ttype.refinement} not satisfied in {connection.topic.ttype}"
+                        errors.REFINEMENT_NOT_SATISFIED.format(
+                            refinement=connection.topic.ttype.refinement, context=connection.topic.ttype
+                        )
                     )
 
                 # TODO: QoS consistency, if there is another publisher with the same topic and qos, check compatibility
@@ -497,19 +519,23 @@ def d_system(context: Context, system: System) -> Context:
             if isinstance(connection.topic.ttype, RefinedType):
                 if not interpret(context, connection.topic.ttype.refinement):
                     context = context.add_error(
-                        f"Refinement {connection.topic.ttype.refinement} not satisfied in {connection.topic.ttype}"
+                        errors.REFINEMENT_NOT_SATISFIED.format(
+                            refinement=connection.topic.ttype.refinement, context=connection.topic.ttype
+                        )
                     )
             else:
                 provider_connections = interpret_connection(context, connection.topic, Service)
                 provider_connections = [x for x in provider_connections if x.role == ServiceActionRole.PROVIDES]
 
                 if len(provider_connections) == 0:
-                    context = context.add_error(f"Provider not found for service {connection.topic}")
+                    context = context.add_error(errors.PROVIDER_NOT_FOUND.format(topic=connection.topic))
 
                 for conn2 in provider_connections:
                     if not is_subtype(context, conn2.topic.ttype, connection.topic.ttype):
                         context = context.add_error(
-                            f"Service {connection.topic} is not a subtype of {conn2.topic.ttype}"
+                            errors.FIELD_NOT_SUBTYPE.format(
+                                field=connection.topic, ttype=connection.topic.ttype, expected_type=conn2.topic.ttype
+                            )
                         )
 
                     # ##################################################################################################
@@ -520,19 +546,23 @@ def d_system(context: Context, system: System) -> Context:
             if isinstance(connection.topic.ttype, RefinedType):
                 if not interpret(context, connection.topic.ttype.refinement):
                     context = context.add_error(
-                        f"Refinement {connection.topic.ttype.refinement} not satisfied in {connection.topic.ttype}"
+                        errors.REFINEMENT_NOT_SATISFIED.format(
+                            refinement=connection.topic.ttype.refinement, context=connection.topic.ttype
+                        )
                     )
             else:
                 provider_connections = interpret_connection(context, connection.topic, Action)
                 provider_connections = [x for x in provider_connections if x.role == ServiceActionRole.PROVIDES]
                 number_of_providers = len(provider_connections)
                 if number_of_providers == 0:
-                    context = context.add_error(f"Provider not found for service {connection.topic}")
+                    context = context.add_error(errors.PROVIDER_NOT_FOUND.format(topic=connection.topic))
 
                 for conn2 in provider_connections:
                     if not is_subtype(context, conn2.topic.ttype, connection.topic.ttype):
                         context = context.add_error(
-                            f"Action {connection.topic} is not a subtype of {conn2.topic.ttype}"
+                            errors.FIELD_NOT_SUBTYPE.format(
+                                field=connection.topic, ttype=connection.topic.ttype, expected_type=conn2.topic.ttype
+                            )
                         )
 
                     # ##################################################################################################

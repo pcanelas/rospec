@@ -32,6 +32,7 @@ from rospec.language.ttypes import (
 from rospec.verification.context import Context
 from rospec.verification.interpreter import interpret
 from rospec.verification.subtyping import is_subtype
+from rospec.language import errors
 
 
 def wrap_equals(identifier: Identifier, value: Expression) -> FunctionCall:
@@ -125,7 +126,7 @@ def convert_to_expression(context: Context, value: Any, ttype: TType) -> Express
     elif isinstance(value, list):
         assert isinstance(ttype, ArrayType)
         return Array(elements=[convert_to_expression(context, item, ttype.ttype) for item in value], ttype=ttype)
-    raise ValueError(f"Unsupported type: {type(value)}")
+    raise ValueError(errors.UNSUPPORTED_TYPE.format(type=type(value)))
 
 
 def check_qos_rules(context, consumer_qos: StructType, provider_qos: StructType) -> bool:
@@ -145,7 +146,11 @@ def check_qos_rules(context, consumer_qos: StructType, provider_qos: StructType)
     }
 
     if set(consumer_qos.fields.keys()) != set(provider_qos.fields.keys()):
-        context.add_error(f"QoS fields do not match: {consumer_qos.fields.keys()} != {provider_qos.fields.keys()}")
+        context.add_error(
+            errors.QOS_FIELDS_MISMATCH.format(
+                consumer_keys=list(consumer_qos.fields.keys()), provider_keys=list(provider_qos.fields.keys())
+            )
+        )
         return False
     for field in consumer_qos.fields.keys():
         assert isinstance(consumer_qos.fields[field], OptionalType)
@@ -154,7 +159,11 @@ def check_qos_rules(context, consumer_qos: StructType, provider_qos: StructType)
         provider_value = provider_qos.fields[field].default_value
 
         if not rules[field](provider_value, consumer_value):
-            context.add_error(f"QoS rule {field} not satisfied: {consumer_value} !< {provider_value}")
+            context.add_error(
+                errors.QOS_RULE_NOT_SATISFIED.format(
+                    field=field, consumer_value=consumer_value, provider_value=provider_value
+                )
+            )
             return False
 
     return True
@@ -169,8 +178,10 @@ def check_color_format(context: Context, consumer: PolicyAttached, provider: Pol
 
     if not consumer_format.fields["format"] == provider_format.fields["format"]:
         context.add_error(
-            f"Color format not satisfied: {consumer_format.fields['format'].default_value} "
-            f"!= {provider_format.fields['format'].default_value}"
+            errors.COLOR_FORMAT_NOT_SATISFIED.format(
+                consumer=consumer_format.fields["format"].default_value,
+                provider=provider_format.fields["format"].default_value,
+            )
         )
         return False
 
@@ -184,7 +195,7 @@ def check_qos(context: Context, consumer_qos: PolicyAttached, provider_qos: Poli
     assert isinstance(consumer_qos_type, StructType) and isinstance(provider_qos_type, StructType)
 
     if not check_qos_rules(context, consumer_qos_type, provider_qos_type):
-        context.add_error("QoS rules not satisfied for subscriber and publisher")
+        context.add_error(errors.QOS_RULES_NOT_SATISFIED)
         return False
 
     return True
@@ -197,18 +208,22 @@ def check_policies(
 ) -> bool:
     # TODO: this checking needs to be done in the actual policy check
     if consumer_policy is None or provider_policy is None:
-        context.add_error("Policies not found for consumer or provider")
+        context.add_error(errors.POLICIES_NOT_FOUND)
         return False
     if consumer_policy == {} and provider_policy == {}:
         return True
     if consumer_policy == {} and provider_policy != {}:
-        context.add_error("Policy not found for consumer when publisher has policies")
+        context.add_error(errors.POLICY_NOT_FOUND_CONSUMER)
         return False
     elif consumer_policy != {} and provider_policy == {}:
-        context.add_error("Policy found for subscriber when publisher has no policies")
+        context.add_error(errors.POLICY_FOUND_NO_PUBLISHER)
         return False
     elif set(consumer_policy.keys()) != set(provider_policy.keys()):
-        context.add_error(f"Policies do not match: {consumer_policy.keys()} != {provider_policy.keys()}")
+        context.add_error(
+            errors.POLICIES_MISMATCH.format(
+                consumer_keys=list(consumer_policy.keys()), provider_keys=list(provider_policy.keys())
+            )
+        )
         return False
 
     dispatcher = {

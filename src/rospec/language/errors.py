@@ -1,0 +1,40 @@
+# Centralized error messages for ROSpec
+
+# CLI and file errors
+SPEC_FILE_NOT_FOUND = "Specification file {spec} not found."
+SPEC_READ_ERROR = "An error occurred while reading {spec}: {error}"
+
+# Frontend parsing errors
+DEFAULT_VALUE_NON_OPTIONAL = "Attempted to provide default value for non-optional."
+MISSING_DEFAULT_OPTIONAL = "Missing default value for optional {args}."
+UNEXPECTED_TOPIC_TYPE = "Unexpected topic type: {type}"
+UNEXPECTED_EXPR_TYPE = "Unexpected topic type: {type}"
+
+# Verification/formation errors
+FIELDS_MISMATCH = "Fields in {fields} do not match {expected_fields}"
+FIELD_NOT_SUBTYPE = "Field {field} : {ttype} is not a subtype of {expected_type}"
+FIELD_NOT_FOUND = "Field {field} not found in {fields}"
+FIELD_NOT_SUBTYPE_POLICY = "Field {field} is not a subtype of {expected_type}"
+NODE_ALREADY_DEFINED = "Node {name} already defined in context"
+NODE_INSTANCE_NOT_SUBTYPE = "Node instance {name} is not subtype of {type} where {struct}"
+DEPENDENCY_NOT_SATISFIED = "Dependency {dependency} not satisfied in {name}"
+PLUGIN_ALREADY_DEFINED = "Plugin {name} already defined in context"
+PLUGIN_INSTANCE_NOT_SUBTYPE = "Plugin instance {name} is not subtype of {type} where {struct}"
+PUBLISHER_NOT_FOUND = "Publisher not found for subscriber {topic}"
+PROVIDER_NOT_FOUND = "Provider not found for service {topic}"
+REFINEMENT_NOT_SATISFIED = "Refinement {refinement} not satisfied in {context}"
+STRUCT_FIELD_MISSING = "Struct {t} is not a subtype of {u}, because the field {key} is not present in {u}"
+STRUCT_FIELD_EXTRA = "Struct {t} is not a subtype of {u}, because the field {key} is not present in {t}"
+FIELD_TYPE_MISMATCH = "{key} has type {t_value} and is not subtype of {u_value}"
+QOS_FIELDS_MISMATCH = "QoS fields do not match: {consumer_keys} != {provider_keys}"
+QOS_RULE_NOT_SATISFIED = "QoS rule {field} not satisfied: {consumer_value} !< {provider_value}"
+QOS_RULES_NOT_SATISFIED = "QoS rules not satisfied for subscriber and publisher"
+POLICIES_NOT_FOUND = "Policies not found for consumer or provider"
+POLICY_NOT_FOUND_CONSUMER = "Policy not found for consumer when publisher has policies"
+POLICY_FOUND_NO_PUBLISHER = "Policy found for subscriber when publisher has no policies"
+POLICIES_MISMATCH = "Policies do not match: {consumer_keys} != {provider_keys}"
+COLOR_FORMAT_NOT_SATISFIED = "Color format not satisfied: {consumer} != {provider}"
+UNSUPPORTED_TYPE = "Unsupported type: {type}"
+UNSUPPORTED_EXPR_TYPE = "Unsupported expression type: {type}"
+EXPR_NOT_SUPPORTED = "Expression {expr} of type {type} not supported"
+EXPR_NOT_RECOGNIZED = "Expression {expr} not recognized"
