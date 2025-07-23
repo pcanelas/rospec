@@ -19,6 +19,7 @@ from rospec.language.nodes import (
 )
 from rospec.language.ttypes import OptionalType, t_bottom
 from rospec.verification.context import Context
+from rospec.language import errors
 
 evaluation_context = {
     # Arithmetic operations
@@ -122,4 +123,4 @@ def interpret(context: Context, expr: Expression):
         result = evaluation_context[expr.operator.name](context, *expr.operands)
         return result
 
-    assert False, f"Expression {expr} of type {type(expr)} not supported"
+    assert False, errors.EXPR_NOT_SUPPORTED.format(expr=expr, type=type(expr))
