@@ -5,7 +5,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.10  # Updated to match your pyproject.toml version
+    rev: v0.12.5  # Updated to match your pyproject.toml version
     hooks:
       - id: ruff
         name: ruff (lint)
@@ -24,7 +24,7 @@ repos:
     hooks:
       - id: pytest
         name: pytest
-        entry: pytest
+        entry: pytest -n auto
         language: system
         pass_filenames: false
   # Should be the last one:

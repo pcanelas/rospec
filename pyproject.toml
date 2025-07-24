@@ -29,6 +29,7 @@ dependencies = [
     "lark==1.2.2",
     "rich==14.0.0",
     "loguru==0.7.3",
+    "pytest-xdist>=3.8.0",
 ]
 
 [project.optional-dependencies]
