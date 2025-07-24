@@ -128,7 +128,7 @@ uv run pre-commit install
 ### Running Tests
 
 ```bash
-uv run pytest
+uv run pytest -n auto
 ```
 
 ### Code Formatting
