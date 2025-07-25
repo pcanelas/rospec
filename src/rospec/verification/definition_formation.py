@@ -44,7 +44,7 @@ from rospec.verification.substitution import (
 )
 from rospec.verification.subtyping import is_subtype
 from rospec.verification.type_formation import ty_formation
-from rospec.verification.utils import convert_to_expression, check_policies
+from rospec.verification.utils import check_dependency, convert_to_expression, check_policies
 from rospec import errors
 
 
@@ -272,14 +272,10 @@ def d_node_instance(context: Context, node_instance: NodeInstance) -> Context:
     # ##################################################################################################################
     # PROPERTY: ALL DEPENDENCIES MUST BE SATISFIED
     if dependency is not None:
-        if not interpret(internal_context, dependency):
-            context = context.add_error(
-                errors.DEPENDENCY_NOT_SATISFIED.format(
-                    component_instance_type="node",
-                    name=node_instance.name.name,
-                    dependency=dependency,
-                )
-            )
+        result_errors = check_dependency(internal_context, node_instance, dependency)
+        for error in result_errors:
+            context = context.add_error(error)
+
     # ##################################################################################################################
 
     result_connections: list[Union[Publisher, Subscriber, Service, Action, TFTransform]] = copy.deepcopy(

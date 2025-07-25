@@ -5,6 +5,7 @@ from rospec.language.nodes import (
     FunctionCall,
     Identifier,
     Literal,
+    NodeInstance,
     Publisher,
     Subscriber,
     Action,
@@ -24,7 +25,6 @@ from rospec.language.ttypes import (
     t_string,
     TType,
     StructType,
-    ArrayType,
     OptionalType,
     BasicType,
     EnumType,
@@ -124,7 +124,6 @@ def convert_to_expression(context: Context, value: Any, ttype: TType) -> Express
             ttype=ttype,
         )
     elif isinstance(value, list):
-        assert isinstance(ttype, ArrayType)
         return Array(elements=[convert_to_expression(context, item, ttype.ttype) for item in value], ttype=ttype)
     raise ValueError(errors.UNSUPPORTED_TYPE.format(type=type(value)))
 
@@ -264,3 +263,27 @@ def aux_replace_enums(enum_type: EnumType, expr: Expression) -> Expression:
         return Array(elements=[aux_replace_enums(enum_type, e) for e in expr.elements], ttype=expr.ttype)
     else:
         raise ValueError(f"Unsupported expression type: {type(expr)}")
+
+
+def check_dependency(context: Context, node_instance: NodeInstance, dependency: Expression):
+    expressions = []
+    current_expression = dependency
+
+    # Split the dependency into a list of expressions, so that we can check each one of them
+    while isinstance(current_expression, FunctionCall) and current_expression.operator.name == "and":
+        expressions.append(current_expression.operands[0])
+        current_expression = current_expression.operands[1]
+    expressions.append(current_expression)
+
+    result_errors = []
+    for expression in expressions:
+        if not interpret(context, expression):
+            result_errors.append(
+                errors.DEPENDENCY_NOT_SATISFIED.format(
+                    component_instance_type="node",
+                    name=node_instance.name.name,
+                    dependency=expression,
+                )
+            )
+
+    return result_errors

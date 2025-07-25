@@ -1,4 +1,4 @@
 ParameterError: The configuration cost_scaling_factor: double is missing from the component instance
 ParameterError: The configuration inflation_radius: double is missing from the component instance
 ParameterError: The configuration robot_radius: double is missing from the component instance
-ParameterDependencyError: node instance configurations for move_base do not respect the dependency defined in the node type: exists(inflation_radius) == exists(cost_scaling_factor) and robot_radius <= inflation_radius
+ParameterDependencyError: node instance configurations for move_base do not respect the dependency defined in the node type: robot_radius <= inflation_radius

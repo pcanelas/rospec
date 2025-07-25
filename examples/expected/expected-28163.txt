@@ -1,2 +1,2 @@
-ParameterDependencyError: node instance configurations for planning_scene_warehouse_viewer do not respect the dependency defined in the node type: is_simulation -> use_monitor and is_simulation -> !(use_robot_data)
+ParameterDependencyError: node instance configurations for planning_scene_warehouse_viewer do not respect the dependency defined in the node type: is_simulation -> use_monitor
 ConnectionError: Publisher not found for subscriber /joint_states in planning_scene_warehouse_viewer
