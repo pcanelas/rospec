@@ -890,7 +890,7 @@ wheels = [
 
 [[package]]
 name = "rospec"
-version = "0.0.3"
+version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "lark" },
@@ -899,8 +899,9 @@ dependencies = [
     { name = "rich" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
+    { name = "build" },
     { name = "mypy" },
     { name = "pep8-naming" },
     { name = "pre-commit" },
@@ -913,35 +914,27 @@ dev = [
     { name = "yapf" },
 ]
 
-[package.dev-dependencies]
-dev = [
-    { name = "build" },
-    { name = "twine" },
-]
-
 [package.metadata]
 requires-dist = [
     { name = "lark", specifier = "==1.2.2" },
     { name = "loguru", specifier = "==0.7.3" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = "==1.15.0" },
-    { name = "pep8-naming", marker = "extra == 'dev'", specifier = "==0.14.1" },
-    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.2.0" },
-    { name = "ptpython", marker = "extra == 'dev'", specifier = "==3.0.29" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = "==8.3.5" },
     { name = "pytest-xdist", specifier = ">=3.8.0" },
     { name = "rich", specifier = "==14.0.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = "==0.11.10" },
-    { name = "tox", marker = "extra == 'dev'", specifier = "==4.25.0" },
-    { name = "twine", marker = "extra == 'dev'", specifier = "==6.1.0" },
-    { name = "types-setuptools", marker = "extra == 'dev'", specifier = "==78.1.0.20250329" },
-    { name = "yapf", marker = "extra == 'dev'", specifier = "==0.43.0" },
 ]
-provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "build", specifier = ">=1.2.2.post1" },
+    { name = "mypy", specifier = ">=1.15.0" },
+    { name = "pep8-naming", specifier = ">=0.14.1" },
+    { name = "pre-commit", specifier = ">=4.2.0" },
+    { name = "ptpython", specifier = ">=3.0.29" },
+    { name = "pytest", specifier = ">=8.3.5" },
+    { name = "ruff", specifier = ">=0.11.10" },
+    { name = "tox", specifier = ">=4.25.0" },
     { name = "twine", specifier = ">=6.1.0" },
+    { name = "types-setuptools", specifier = ">=78.1.0.20250329" },
+    { name = "yapf", specifier = ">=0.43.0" },
 ]
 
 [[package]]
