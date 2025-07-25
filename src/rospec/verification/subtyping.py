@@ -72,14 +72,16 @@ def is_subtype_struct(context: Context, t: StructType, u: StructType) -> bool:
     result = True
     for key in t.fields.keys():
         if key not in u.fields:
-            context.add_error(errors.STRUCT_FIELD_MISSING.format(t=t, u=u, key=key))
+            context.add_error(
+                errors.STRUCT_FIELD_EXTRA.format(key=key, ttype=t.fields[key], fields=list(u.fields.keys()))
+            )
             result = False
 
     # ##################################################################################################################
     # PROPERTY: ALL NON-OPTIONAL VALUES IN u MUST EXIST IN t
     for u_key, u_value in u.fields.items():
         if not isinstance(u_value, OptionalType) and u_key not in t.fields:
-            context.add_error(errors.STRUCT_FIELD_EXTRA.format(t=t, u=u, key=u_key))
+            context.add_error(errors.STRUCT_FIELD_MISSING.format(key=u_key, ttype=u_value))
             result = False
 
     # ##################################################################################################################
@@ -87,9 +89,7 @@ def is_subtype_struct(context: Context, t: StructType, u: StructType) -> bool:
     for t_key, t_value in t.fields.items():
         if t_key in u.fields:
             u_value = u.fields[t_key]
-            if not is_subtype(context, t_value, u_value):
-                context.add_error(errors.FIELD_TYPE_MISMATCH.format(key=t_key, t_value=t_value, u_value=u_value))
-                result = False
+            result = result and is_subtype(context, t_value, u_value)
 
     return result
 

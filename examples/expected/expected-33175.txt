@@ -1,1 +1,1 @@
-Dependency base_frame_name == "odom" -> !(exists(fixed_camera)) not satisfied in rgbdslam
+ParameterDependencyError: node instance configurations for rgbdslam do not respect the dependency defined in the node type: base_frame_name == "odom" -> !(exists(fixed_camera))

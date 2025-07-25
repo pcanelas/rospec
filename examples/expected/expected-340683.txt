@@ -1,1 +1,1 @@
-Broadcast "base_link" -> "odom" has multiple parents
+TFError: Broadcast "base_link" to "odom" has multiple parents: ['global_costmap_t', 'local_costmap']

@@ -180,7 +180,7 @@ def d_node_type(context: Context, node_type: NodeType) -> Context:
 
 def d_node_instance(context: Context, node_instance: NodeInstance) -> Context:
     if node_instance.name.name in context.typing:
-        return context.add_error(f"Node {node_instance.name.name} already defined in context")
+        return context.add_error(errors.VARIABLE_ALREADY_DEFINED.format(variable=node_instance.name.name))
 
     context = context.add_typing(node_instance.name.name, t_bottom)
     internal_context = context.add_typing(node_instance.name.name, t_bottom)
@@ -204,7 +204,11 @@ def d_node_instance(context: Context, node_instance: NodeInstance) -> Context:
         st_config_name, st_config_expr = st_formation(internal_context, config)
         if st_config_name not in x2_node_type.fields.fields.keys():
             context = context.add_error(
-                f"Configurable information {st_config_name} not found in {node_instance.node_type.name}"
+                errors.CONFIGURABLE_INFORMATION_NOT_FOUND.format(
+                    configurable_information=st_config_name,
+                    node_instance=node_instance.name.name,
+                    node_type=node_instance.node_type.name,
+                )
             )
             continue
 
@@ -238,11 +242,8 @@ def d_node_instance(context: Context, node_instance: NodeInstance) -> Context:
     )
 
     if not is_subtype(internal_context, node_instance_struct, x2_node_type.fields):
-        context = context.add_error(
-            errors.NODE_INSTANCE_NOT_SUBTYPE.format(
-                name=node_instance.name.name, type=x2_node_type, struct=node_instance_struct
-            )
-        )
+        for error in internal_context.errors:
+            context = context.add_error(error)
 
     # ##################################################################################################################
     # We need to add the optional values in x2_struct that are not defined in the internal_context
@@ -273,7 +274,11 @@ def d_node_instance(context: Context, node_instance: NodeInstance) -> Context:
     if dependency is not None:
         if not interpret(internal_context, dependency):
             context = context.add_error(
-                errors.DEPENDENCY_NOT_SATISFIED.format(dependency=dependency, name=node_instance.name.name)
+                errors.DEPENDENCY_NOT_SATISFIED.format(
+                    component_instance_type="node",
+                    name=node_instance.name.name,
+                    dependency=dependency,
+                )
             )
     # ##################################################################################################################
 
@@ -326,7 +331,9 @@ def d_plugin_type(context: Context, plugin_type: PluginType) -> Context:
             if isinstance(config_ty.default_value, Literal) and isinstance(new_ttype_replaced, RefinedType):
                 if not interpret(context=context, expr=new_ttype_replaced.refinement):
                     context.add_error(
-                        f"Refinement {new_ttype_replaced.refinement} not satisfied in {config_ty.default_value}"
+                        errors.PARAMETER_DEFAULT_INVALID.format(
+                            value=config_ty.default_value, parameter=config_string, ttype=config_ty.ttype
+                        )
                     )
 
     connections: list[Union[Publisher, Subscriber, Service, Action, TFTransform]] = []
@@ -351,7 +358,7 @@ def d_plugin_type(context: Context, plugin_type: PluginType) -> Context:
 
 def d_plugin_instance(context: Context, plugin_instance: PluginInstance):
     if plugin_instance.name.name in context.typing:
-        return context.add_error(f"Plugin {plugin_instance.name.name} already defined in context")
+        return context.add_error(errors.VARIABLE_ALREADY_DEFINED.format(variable=plugin_instance.name.name))
 
     context = context.add_typing(plugin_instance.name.name, t_bottom)
     internal_context = context.add_typing(plugin_instance.name.name, t_bottom)
@@ -375,7 +382,11 @@ def d_plugin_instance(context: Context, plugin_instance: PluginInstance):
         st_config_name, st_config_expr = st_formation(internal_context, config)
         if st_config_name not in x2_plugin_type.fields.fields.keys():
             context = context.add_error(
-                f"Configurable information {st_config_name} not found in {plugin_instance.plugin_ttype.name}"
+                errors.CONFIGURABLE_INFORMATION_NOT_FOUND.format(
+                    configurable_information=st_config_name,
+                    node_instance=plugin_instance.name.name,
+                    node_type=plugin_instance.node_type.name,
+                )
             )
             continue
 
@@ -409,11 +420,8 @@ def d_plugin_instance(context: Context, plugin_instance: PluginInstance):
     )
 
     if not is_subtype(internal_context, plugin_instance_st, x2_plugin_type.fields):
-        context = context.add_error(
-            errors.PLUGIN_INSTANCE_NOT_SUBTYPE.format(
-                name=plugin_instance.name.name, type=x2_plugin_type, struct=plugin_instance_st
-            )
-        )
+        for error in internal_context.errors:
+            context = context.add_error(error)
 
     # ##################################################################################################################
     # We need to add the optional values in x2_struct that are not defined in the internal_context
@@ -444,7 +452,11 @@ def d_plugin_instance(context: Context, plugin_instance: PluginInstance):
     if dependency is not None:
         if not interpret(internal_context, dependency):
             context = context.add_error(
-                errors.DEPENDENCY_NOT_SATISFIED.format(dependency=dependency, name=plugin_instance.name.name)
+                errors.DEPENDENCY_NOT_SATISFIED.format(
+                    component_instance_type="plugin",
+                    name=plugin_instance.name.name,
+                    dependency=dependency,
+                )
             )
     # ##################################################################################################################
 
@@ -495,21 +507,23 @@ def d_system(context: Context, system: System) -> Context:
             if isinstance(connection.topic.ttype, RefinedType):
                 if not interpret(context, connection.topic.ttype.refinement):
                     context = context.add_error(
-                        errors.REFINEMENT_NOT_SATISFIED.format(
-                            refinement=connection.topic.ttype.refinement, context=connection.topic.ttype
+                        errors.CONNECTION_REFINEMENT_NOT_SATISFIED.format(
+                            refinement=connection.topic.ttype.refinement, connection=connection
                         )
                     )
             else:
                 pub_connections = interpret_connection(context, connection.topic, Publisher)
 
                 if len(pub_connections) == 0:
-                    context = context.add_error(errors.PUBLISHER_NOT_FOUND.format(topic=connection.topic))
+                    context = context.add_error(
+                        errors.PUBLISHER_NOT_FOUND.format(topic=connection.topic, component=node)
+                    )
 
                 for conn2 in pub_connections:
                     if not is_subtype(context, conn2.topic.ttype, connection.topic.ttype):
                         context = context.add_error(
-                            errors.FIELD_NOT_SUBTYPE.format(
-                                field=connection.topic, ttype=connection.topic.ttype, expected_type=conn2.topic.ttype
+                            errors.CONNECTION_NOT_SUBTYPE.format(
+                                connection=connection, expected_type=connection.topic.ttype, component=node
                             )
                         )
 
@@ -521,8 +535,8 @@ def d_system(context: Context, system: System) -> Context:
             if isinstance(connection.topic.ttype, RefinedType):
                 if not interpret(context, connection.topic.ttype.refinement):
                     context = context.add_error(
-                        errors.REFINEMENT_NOT_SATISFIED.format(
-                            refinement=connection.topic.ttype.refinement, context=connection.topic.ttype
+                        errors.CONNECTION_REFINEMENT_NOT_SATISFIED.format(
+                            refinement=connection.topic.ttype.refinement, connection=connection
                         )
                     )
 
@@ -532,8 +546,8 @@ def d_system(context: Context, system: System) -> Context:
             if isinstance(connection.topic.ttype, RefinedType):
                 if not interpret(context, connection.topic.ttype.refinement):
                     context = context.add_error(
-                        errors.REFINEMENT_NOT_SATISFIED.format(
-                            refinement=connection.topic.ttype.refinement, context=connection.topic.ttype
+                        errors.CONNECTION_REFINEMENT_NOT_SATISFIED.format(
+                            refinement=connection.topic.ttype.refinement, connection=connection
                         )
                     )
             else:
@@ -541,13 +555,13 @@ def d_system(context: Context, system: System) -> Context:
                 provider_connections = [x for x in provider_connections if x.role == ServiceActionRole.PROVIDES]
 
                 if len(provider_connections) == 0:
-                    context = context.add_error(errors.PROVIDER_NOT_FOUND.format(topic=connection.topic))
+                    context = context.add_error(errors.PROVIDER_NOT_FOUND.format(connection=connection, component=node))
 
                 for conn2 in provider_connections:
                     if not is_subtype(context, conn2.topic.ttype, connection.topic.ttype):
                         context = context.add_error(
-                            errors.FIELD_NOT_SUBTYPE.format(
-                                field=connection.topic, ttype=connection.topic.ttype, expected_type=conn2.topic.ttype
+                            errors.CONNECTION_NOT_SUBTYPE.format(
+                                connection=connection, expected_type=connection.topic.ttype, component=node
                             )
                         )
 
@@ -559,8 +573,8 @@ def d_system(context: Context, system: System) -> Context:
             if isinstance(connection.topic.ttype, RefinedType):
                 if not interpret(context, connection.topic.ttype.refinement):
                     context = context.add_error(
-                        errors.REFINEMENT_NOT_SATISFIED.format(
-                            refinement=connection.topic.ttype.refinement, context=connection.topic.ttype
+                        errors.CONNECTION_REFINEMENT_NOT_SATISFIED.format(
+                            refinement=connection.topic.ttype.refinement, connection=connection
                         )
                     )
             else:
@@ -568,13 +582,15 @@ def d_system(context: Context, system: System) -> Context:
                 provider_connections = [x for x in provider_connections if x.role == ServiceActionRole.PROVIDES]
                 number_of_providers = len(provider_connections)
                 if number_of_providers == 0:
-                    context = context.add_error(errors.PROVIDER_NOT_FOUND.format(topic=connection.topic))
+                    context = context.add_error(
+                        errors.PROVIDER_NOT_FOUND.format(topic=connection.topic, component=node)
+                    )
 
                 for conn2 in provider_connections:
                     if not is_subtype(context, conn2.topic.ttype, connection.topic.ttype):
                         context = context.add_error(
-                            errors.FIELD_NOT_SUBTYPE.format(
-                                field=connection.topic, ttype=connection.topic.ttype, expected_type=conn2.topic.ttype
+                            errors.CONNECTION_NOT_SUBTYPE.format(
+                                connection=connection, expected_type=connection.topic.ttype, component=node
                             )
                         )
 
@@ -599,7 +615,7 @@ def d_system(context: Context, system: System) -> Context:
                             broadcasters.append(conn2)
                 if len(broadcasters) == 0:
                     context = context.add_error(
-                        f"Broadcaster not found for listener {connection.child_frame} -> {connection.parent_frame}"
+                        errors.BROADCASTER_NOT_FOUND.format(listener=connection, component=node)
                     )
 
             if connection.transform == TransformType.BROADCAST:
@@ -616,12 +632,19 @@ def d_system(context: Context, system: System) -> Context:
                         # TODO: we need proper algorithm to find cycles in graph
                         if broadcast1_parent == broadcast2_child and broadcast1_child == broadcast2_parent:
                             context = context.add_error(
-                                f"Broadcast {connection.child_frame} -> {connection.parent_frame} is cyclic"
+                                errors.BROADCASTER_CYCLIC.format(
+                                    child_frame=connection.child_frame,
+                                    parent_frame=connection.parent_frame,
+                                )
                             )
 
                 if len(other_broadcasters) > 0:
                     context = context.add_error(
-                        f"Broadcast {connection.child_frame} -> {connection.parent_frame} has multiple parents"
+                        errors.BROADCASTER_MULTIPLE_PARENTS.format(
+                            child_frame=connection.child_frame,
+                            parent_frame=connection.parent_frame,
+                            parents=[broadcaster.node.name for broadcaster in other_broadcasters] + [node],
+                        )
                     )
 
     return context

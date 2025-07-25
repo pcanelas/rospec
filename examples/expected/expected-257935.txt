@@ -1,1 +1,1 @@
-Publisher not found for subscriber imu_data
+ConnectionError: Publisher not found for subscriber imu_data in custom_node

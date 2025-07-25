@@ -1,4 +1,9 @@
-# Centralized error messages for ROSpec
+# Custom Error Exception that receives a message
+class ROSpecError(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
 
 # CLI and file errors
 SPEC_FILE_NOT_FOUND = "CLI: Specification file {spec} not found"
@@ -32,7 +37,6 @@ MESSAGE_FIELD_ERROR = (
     "MessageAliasError: Field {field} of type {ttype} is not present in the aliased message {expected_type}"
 )
 MESSAGE_FIELD_NOT_SUBTYPE = "MessageAliasError: Field {field} of type {ttype} is not subtype of {expected_type} from the field type in the aliased message"
-
 POLICY_NOT_STRUCT = "ROSpecFormationError: Policy type {policy} does not exist"
 POLICY_ALREADY_DEFINED = "ROSpecFormationError: Policy instance with name {policy} already defined"
 
@@ -40,32 +44,45 @@ POLICY_FIELD_NOT_FOUND = "ROSpecFormationError: Policy field {field} not found i
 POLICY_FIELD_NOT_SUBTYPE = (
     "ROSpecFormationError: Policy field {field} defined with value {value} does not match defined type {ttype}"
 )
-
 PARAMETER_DEFAULT_INVALID = (
     "ParameterError: Default value {value} for parameter {parameter} does not match defined type {ttype}"
 )
+VARIABLE_ALREADY_DEFINED = "ROSpecFormationError: Variable {variable} already defined in the program"
+CONFIGURABLE_INFORMATION_NOT_FOUND = "ParameterError: Configurable information {configurable_information} instanced in {node_instance} was not found in the node type {node_type}"
+DEPENDENCY_NOT_SATISFIED = "ParameterDependencyError: {component_instance_type} instance configurations for {name} do not respect the dependency defined in the {component_instance_type} type: {dependency}"
+CONNECTION_REFINEMENT_NOT_SATISFIED = "ConnectionError: Connection property {refinement} not satisfied in: {connection}"
+CONNECTION_NOT_SUBTYPE = (
+    "ConnectionError: Message type for {connection} does not match the expected type {expected_type}"
+)
+PROVIDER_NOT_FOUND = "ConnectionError: Provider not found for {connection} in {component}"
+BROADCASTER_NOT_FOUND = "TFError: Broadcaster not found for listener {listener} in {component}"
+BROADCASTER_MULTIPLE_PARENTS = "TFError: Broadcast {child_frame} to {parent_frame} has multiple parents: {parents}"
+BROADCASTER_CYCLIC = "TFError: Broadcast {child_frame} to {parent_frame} is cyclic"
+PUBLISHER_NOT_FOUND = "ConnectionError: Publisher not found for subscriber {topic} in {component}"
 
-FIELDS_MISMATCH = "Subtyping: Fields in {fields} do not match {expected_fields}"
-FIELD_NOT_SUBTYPE_POLICY = "Subtyping: Field {field} is not a subtype of {expected_type}"
-NODE_ALREADY_DEFINED = "Node {name} already defined in context"
-NODE_INSTANCE_NOT_SUBTYPE = "Node instance {name} is not subtype of {type} where {struct}"
-DEPENDENCY_NOT_SATISFIED = "Dependency {dependency} not satisfied in {name}"
-PLUGIN_ALREADY_DEFINED = "Plugin {name} already defined in context"
-PLUGIN_INSTANCE_NOT_SUBTYPE = "Plugin instance {name} is not subtype of {type} where {struct}"
-PUBLISHER_NOT_FOUND = "Publisher not found for subscriber {topic}"
-PROVIDER_NOT_FOUND = "Provider not found for service {topic}"
+# Subtyping errors
+STRUCT_FIELD_MISSING = "ParameterError: The configuration {key}: {ttype} is missing from the component instance"
+STRUCT_FIELD_EXTRA = "ParameterError: The configuration {key}: {ttype} is not defined in the component type, expected one of the following configurations: {fields}"
 REFINEMENT_NOT_SATISFIED = "Refinement {refinement} not satisfied in {context}"
-STRUCT_FIELD_MISSING = "Struct {t} is not a subtype of {u}, because the field {key} is not present in {u}"
-STRUCT_FIELD_EXTRA = "Struct {t} is not a subtype of {u}, because the field {key} is not present in {t}"
-FIELD_TYPE_MISMATCH = "{key} has type {t_value} and is not subtype of {u_value}"
-QOS_FIELDS_MISMATCH = "QoS fields do not match: {consumer_keys} != {provider_keys}"
-QOS_RULE_NOT_SATISFIED = "QoS rule {field} not satisfied: {consumer_value} !< {provider_value}"
-QOS_RULES_NOT_SATISFIED = "QoS rules not satisfied for subscriber and publisher"
-POLICIES_NOT_FOUND = "Policies not found for consumer or provider"
-POLICY_NOT_FOUND_CONSUMER = "Policy not found for consumer when publisher has policies"
-POLICY_FOUND_NO_PUBLISHER = "Policy found for subscriber when publisher has no policies"
-POLICIES_MISMATCH = "Policies do not match: {consumer_keys} != {provider_keys}"
-COLOR_FORMAT_NOT_SATISFIED = "Color format not satisfied: {consumer} != {provider}"
+
+# Utils errors
+QOS_FIELDS_MISMATCH = "QoSError: QoS fields do not match: {consumer_keys} != {provider_keys}"
+QOS_RULE_NOT_SATISFIED = "QoSError: Mismatch in quality of service for {qos_field}, consumer value {consumer_value} does not match provider value {provider_value}"
+
+POLICIES_NOT_FOUND = "ROSpecFormationError: Policies for either consumer or provider are set to None"
+POLICY_NOT_FOUND_CONSUMER = (
+    "PolicyError: Policy not found for consumer, publisher defines the following policies: {policies}"
+)
+POLICY_FOUND_NO_PUBLISHER = (
+    "PolicyError: Policy not found for provider, consumer defines the following policies: {policies}"
+)
+POLICIES_MISMATCH = (
+    "PolicyError: Provider and consumer do not provide the same set of policies: {consumer_keys} != {provider_keys}"
+)
+COLOR_FORMAT_NOT_SATISFIED = (
+    "PolicyError: Color format policy for consumer ({consumer}) does not match the format for provider ({provider})"
+)
 UNSUPPORTED_TYPE = "Unsupported type: {type}"
-UNSUPPORTED_EXPR_TYPE = "Unsupported expression type: {type}"
+
+# Other errors
 EXPR_NOT_SUPPORTED = "Expression {expr} of type {type} not supported"

@@ -31,7 +31,12 @@ def verify_program(context: Context, parsed_program: Program) -> list[str]:
     """
     Verify the parsed program and return a list of errors.
     """
-    return program_formation(context, parsed_program)
+    try:
+        return program_formation(context, parsed_program)
+    except errors.ROSpecError as e:
+        return [e.message]
+    except Exception as e:
+        raise e
 
 
 def load_context() -> Context:
@@ -83,9 +88,7 @@ def main(args: Optional[list[str]] = None) -> None:
     program: str = merge_specifications(args.specifications)
     parsed_program: Program = parse_program(program)
     context: Context = load_context()
-    errors: list[str] = verify_program(
-        context, parsed_program
-    )  # TODO: There may be errors raised, we need to capture and print them
+    errors: list[str] = verify_program(context, parsed_program)
     process_errors(errors, args.output)
 
 

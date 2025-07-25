@@ -1,1 +1,1 @@
-Provider not found for service get_distance_to_obstacle
+ConnectionError: Provider not found for consumes service get_distance_to_obstacle: hector_nav_msgs/GetDistanceToObstacle in hector_object_tracker

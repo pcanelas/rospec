@@ -1,1 +1,1 @@
-Dependency is_simulation -> use_sim_time not satisfied in joint_controller
+ParameterDependencyError: node instance configurations for joint_controller do not respect the dependency defined in the node type: is_simulation -> use_sim_time

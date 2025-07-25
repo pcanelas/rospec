@@ -53,7 +53,7 @@ def check_at_least_one_publisher(connections: list[Union[Publisher, Subscriber, 
     for subscriber in subscribers:
         # There must be at least one publisher for topic in publishers
         assert any([publisher.topic.name == subscriber.topic.name for publisher in publishers]), (
-            f"Subscriber {subscriber.topic.name} has no publisher"
+            errors.PUBLISHER_NOT_FOUND.format(topic=subscriber.topic, component=subscriber.node)
         )
 
     actions = filter_connection_by_type(connections, Action)
@@ -63,7 +63,7 @@ def check_at_least_one_publisher(connections: list[Union[Publisher, Subscriber, 
         # There must be at least one action provider for topic in action_providers
         assert any(
             [action_provider.topic.name == action_consumer.topic.name for action_provider in action_providers]
-        ), f"Action consumer {action_consumer.topic.value} has no provider"
+        ), errors.PROVIDER_NOT_FOUND.format(topic=action_consumer.topic, component=action_consumer.node)
 
     services = filter_connection_by_type(connections, Service)
     service_providers = [service for service in services if service.role == ServiceActionRole.PROVIDES]
@@ -72,7 +72,7 @@ def check_at_least_one_publisher(connections: list[Union[Publisher, Subscriber, 
         # There must be at least one service provider for topic in service_providers
         assert any(
             [service_provider.topic.name == service_consumer.topic.name for service_provider in service_providers]
-        ), f"Service consumer {service_consumer.topic.value} has no provider"
+        ), errors.PROVIDER_NOT_FOUND.format(topic=service_consumer.topic, component=service_consumer.node)
 
 
 def check_subtyping_connections(context: Context, connections: list[Union[Publisher, Subscriber, Service, Action]]):
@@ -144,14 +144,20 @@ def check_qos_rules(context, consumer_qos: StructType, provider_qos: StructType)
         "lifespan": lambda x, y: True,
         "depth": lambda x, y: True,
     }
-
-    if set(consumer_qos.fields.keys()) != set(provider_qos.fields.keys()):
-        context.add_error(
-            errors.QOS_FIELDS_MISMATCH.format(
-                consumer_keys=list(consumer_qos.fields.keys()), provider_keys=list(provider_qos.fields.keys())
+    local_errors = []
+    for field in provider_qos.fields.keys():
+        if field not in provider_qos.fields.keys():
+            errors.append(
+                errors.QOS_FIELDS_MISMATCH.format(
+                    field=field,
+                    expected_fields=list(provider_qos.fields.keys()),
+                )
             )
-        )
+
+    if len(local_errors) > 0:
+        context.errors.extend(local_errors)
         return False
+
     for field in consumer_qos.fields.keys():
         assert isinstance(consumer_qos.fields[field], OptionalType)
         assert isinstance(consumer_qos.fields[field], OptionalType)
@@ -161,7 +167,7 @@ def check_qos_rules(context, consumer_qos: StructType, provider_qos: StructType)
         if not rules[field](provider_value, consumer_value):
             context.add_error(
                 errors.QOS_RULE_NOT_SATISFIED.format(
-                    field=field, consumer_value=consumer_value, provider_value=provider_value
+                    qos_field=field, consumer_value=consumer_value, provider_value=provider_value
                 )
             )
             return False
@@ -194,11 +200,7 @@ def check_qos(context: Context, consumer_qos: PolicyAttached, provider_qos: Poli
 
     assert isinstance(consumer_qos_type, StructType) and isinstance(provider_qos_type, StructType)
 
-    if not check_qos_rules(context, consumer_qos_type, provider_qos_type):
-        context.add_error(errors.QOS_RULES_NOT_SATISFIED)
-        return False
-
-    return True
+    return check_qos_rules(context, consumer_qos_type, provider_qos_type)
 
 
 def check_policies(
@@ -213,10 +215,10 @@ def check_policies(
     if consumer_policy == {} and provider_policy == {}:
         return True
     if consumer_policy == {} and provider_policy != {}:
-        context.add_error(errors.POLICY_NOT_FOUND_CONSUMER)
+        context.add_error(errors.POLICY_NOT_FOUND_CONSUMER.format(policies=list(provider_policy.keys())))
         return False
     elif consumer_policy != {} and provider_policy == {}:
-        context.add_error(errors.POLICY_FOUND_NO_PUBLISHER)
+        context.add_error(errors.POLICY_FOUND_NO_PUBLISHER.format(policies=list(consumer_policy.keys())))
         return False
     elif set(consumer_policy.keys()) != set(provider_policy.keys()):
         context.add_error(

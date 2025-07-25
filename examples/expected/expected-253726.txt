@@ -1,1 +1,1 @@
-Node ratslam_ros already defined in context
+ROSpecFormationError: Variable ratslam_ros already defined in the program

@@ -1,1 +1,1 @@
-Provider not found for service /camera/set_camera_info
+ConnectionError: Provider not found for consumes service /camera/set_camera_info: sensor_msgs/SetCameraInfo in camera_calibration

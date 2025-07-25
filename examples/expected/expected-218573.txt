@@ -1,2 +1,2 @@
-Refinement count(publishers(image)) == 1 not satisfied in image:sensor_msgs/Image where {count(publishers(image)) == 1}
-Refinement count(publishers(image)) == 1 not satisfied in image:sensor_msgs/Image where {count(publishers(image)) == 1}
+ConnectionError: Connection property count(publishers(image)) == 1 not satisfied in: publishes to image: sensor_msgs/Image where {count(publishers(image)) == 1}
+ConnectionError: Connection property count(publishers(image)) == 1 not satisfied in: publishes to image: sensor_msgs/Image where {count(publishers(image)) == 1}

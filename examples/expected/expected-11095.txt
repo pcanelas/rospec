@@ -1,2 +1,2 @@
-Dependency is_simulation -> use_sim_time not satisfied in laser_scan_matcher
-Broadcaster not found for listener laser -> base_link
+ParameterDependencyError: node instance configurations for laser_scan_matcher do not respect the dependency defined in the node type: is_simulation -> use_sim_time
+TFError: Broadcaster not found for listener listen base_link to laser in laser_scan_matcher

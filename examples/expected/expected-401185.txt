@@ -1,2 +1,2 @@
-Dependency exists(initial_pose) -> set_initial_pose and exists(initial_pose) and set_initial_pose -> always_reset_initial_pose not satisfied in amcl
-Publisher not found for subscriber initialpose
+ParameterDependencyError: node instance configurations for amcl do not respect the dependency defined in the node type: exists(initial_pose) -> set_initial_pose and exists(initial_pose) and set_initial_pose -> always_reset_initial_pose
+ConnectionError: Publisher not found for subscriber initialpose in amcl

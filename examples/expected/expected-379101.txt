@@ -1,1 +1,1 @@
-Dependency number_of_robots > 1 -> exists(tf_prefix) not satisfied in robot_state_publisher
+ParameterDependencyError: node instance configurations for robot_state_publisher do not respect the dependency defined in the node type: number_of_robots > 1 -> exists(tf_prefix)

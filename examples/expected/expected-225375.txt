@@ -1,1 +1,1 @@
-Publisher not found for subscriber /set_pose
+ConnectionError: Publisher not found for subscriber /set_pose in ekf_localization_node
