@@ -61,6 +61,7 @@ from rospec.language.utils import (
     replace_empty_in_attributes,
 )
 from rospec.verification.substitution import inverse_substitution_expr_expr, inverse_expr_substitution_in_type
+from rospec import errors
 
 
 class TreeToROSpec(Interpreter):
@@ -232,10 +233,8 @@ class TreeToROSpec(Interpreter):
 
         # This ensures that we always have the right number of arguments
         if len(args) == 4:
-            if not is_optional:
-                raise ValueError("Attempted to provide default value for non-optional.")
-            else:
-                raise ValueError(f"Missing default value for optional {args}.")
+            assert is_optional, errors.MISSING_DEFAULT_OPTIONAL.format(variable=args[1])
+            assert not is_optional, errors.DEFAULT_VALUE_NON_OPTIONAL.format(variable=args[1], value=args[3])
 
         if is_optional:
             args = args[1:]
@@ -280,7 +279,7 @@ class TreeToROSpec(Interpreter):
         elif isinstance(topic, FunctionCall):
             topic = FunctionCall(operator=topic.operator, operands=copy.deepcopy(topic.operands), ttype=ttype)
         else:
-            raise ValueError(f"Unexpected topic type: {type(topic)}")
+            raise ValueError(errors.UNEXPECTED_TOPIC_TYPE.format(type=type(topic)))
         connection_constructor = {
             "publishes to": Publisher,
             "subscribes to": Subscriber,
@@ -299,7 +298,7 @@ class TreeToROSpec(Interpreter):
         elif isinstance(expr, FunctionCall):
             topic = FunctionCall(operator=expr.operator, operands=copy.deepcopy(expr.operands), ttype=topic_ttype)
         else:
-            raise ValueError(f"Unexpected topic type: {type(expr)}")
+            raise ValueError(errors.UNEXPECTED_TOPIC_TYPE.format(type=type(expr)))
         return service_action_constructor(
             role=role, node=Identifier(name="_", ttype=t_bottom), topic=topic, policies=None
         )

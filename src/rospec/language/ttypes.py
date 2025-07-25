@@ -83,7 +83,7 @@ class RefinedType(TType):
         return self.__str__()
 
     def __str__(self):
-        return f"{self.name}:{self.ttype} where {{{self.refinement}}}"
+        return f"{self.name}: {self.ttype} where {{{self.refinement}}}"
 
 
 @dataclass(frozen=True)

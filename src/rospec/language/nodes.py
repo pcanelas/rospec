@@ -5,7 +5,7 @@ from enum import Enum
 from typing import List, Union, Optional, Dict
 from dataclasses import dataclass, field
 
-from rospec.language.ttypes import TType, OptionalType, BasicType
+from rospec.language.ttypes import RefinedType, TType, OptionalType, BasicType
 
 
 class TransformType(Enum):
@@ -212,7 +212,9 @@ class Publisher(Statement):
     policies: Optional[dict[str, PolicyAttached]]
 
     def __str__(self):
-        return f"{self.node} publishes to {self.topic}: {self.topic.ttype}"
+        if isinstance(self.topic.ttype, RefinedType):
+            return f"publishes to {self.topic.ttype}"
+        return f"publishes to {self.topic}: {self.topic.ttype}"
 
 
 @dataclass(repr=True)
@@ -224,7 +226,9 @@ class Subscriber(Statement):
     policies: Optional[dict[str, PolicyAttached]]
 
     def __str__(self):
-        return f"{self.node} subscribes to {self.topic}: {self.topic.ttype}"
+        if isinstance(self.topic.ttype, RefinedType):
+            return f"subscribes to {self.topic.ttype}"
+        return f"subscribes to {self.topic}: {self.topic.ttype}"
 
 
 @dataclass(repr=True)
@@ -235,7 +239,9 @@ class Service(Statement):
     policies: Optional[dict[str, PolicyAttached]]
 
     def __str__(self):
-        return f"{self.node} {self.role} service {self.topic}: {self.topic.ttype}"
+        if isinstance(self.topic.ttype, RefinedType):
+            return f"{self.role} service {self.topic.ttype}"
+        return f"{self.role} service {self.topic}: {self.topic.ttype}"
 
 
 @dataclass(repr=True)
@@ -246,7 +252,9 @@ class Action(Statement):
     policies: Optional[dict[str, PolicyAttached]]
 
     def __str__(self):
-        return f"{self.node} {self.role} action {self.topic}: {self.topic.ttype}"
+        if isinstance(self.topic.ttype, RefinedType):
+            return f"{self.role} action {self.topic.ttype}"
+        return f"{self.role} action {self.topic}: {self.topic.ttype}"
 
 
 @dataclass(repr=True)

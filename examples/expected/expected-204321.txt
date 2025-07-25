@@ -1,1 +1,1 @@
-Publisher not found for subscriber /RosAria/cmd_vel
+ConnectionError: Publisher not found for subscriber /RosAria/cmd_vel in rosaria_node

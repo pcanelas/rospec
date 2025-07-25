@@ -1,2 +1,2 @@
-Publisher not found for subscriber /kinect2/pointcloud_filtered
-Broadcaster not found for listener kinect2_link -> target_frame
+ConnectionError: Publisher not found for subscriber /kinect2/pointcloud_filtered in pointcloud_to_laserscan
+TFError: Broadcaster not found for listener listen target_frame to kinect2_link in pointcloud_to_laserscan

@@ -1,1 +1,1 @@
-Broadcast odom -> map has multiple parents
+TFError: Broadcast odom to map has multiple parents: ['static_transform_publisher', 'amcl']

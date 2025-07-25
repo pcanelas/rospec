@@ -1,1 +1,1 @@
-Publisher not found for subscriber /rgbdslam/batch_clouds
+ConnectionError: Publisher not found for subscriber /rgbdslam/batch_clouds in custom_node

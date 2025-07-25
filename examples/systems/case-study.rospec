@@ -122,7 +122,7 @@ node type amcl_type {
     @qos{sensor_data_profile}
     subscribes to content(scan_topic): RestrictedLaserScan;
 
-    @qos{sensor_data}
+    @qos{sensor_data_profile}
     publishes to particle_cloud: nav2_msgs/ParticleCloud;
 
     @qos{transient_reliable_qos}

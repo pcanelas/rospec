@@ -1,1 +1,1 @@
-Configurable information penalize_negative_x not found in dwa_local_planner_type
+ParameterError: Configurable information penalize_negative_x instanced in dwa_local_planner was not found in the node type dwa_local_planner_type

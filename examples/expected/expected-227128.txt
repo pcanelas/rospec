@@ -1,3 +1,3 @@
-Broadcast base_footprint -> odom has multiple parents
-Broadcast base_footprint -> odo has multiple parents
-Broadcaster not found for listener base_footprint -> odom
+TFError: Broadcast base_footprint to odom has multiple parents: ['node1_type', 'gps_node_type', 'node0']
+TFError: Broadcast base_footprint to odo has multiple parents: ['gps_node_type', 'node1']
+TFError: Broadcaster not found for listener listen odom to base_footprint in robot_localization_ekf

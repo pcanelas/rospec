@@ -1,1 +1,1 @@
-Broadcaster not found for listener "base_link" -> "base_link"
+TFError: Broadcaster not found for listener listen "base_link" to "base_link" in hector_mapping

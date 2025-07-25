@@ -1,1 +1,1 @@
-Publisher not found for subscriber /robo/cmd_vel
+ConnectionError: Publisher not found for subscriber /robo/cmd_vel in custom_node

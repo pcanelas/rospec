@@ -1,1 +1,1 @@
-Publisher not found for subscriber initialpose_dqn
+ConnectionError: Publisher not found for subscriber initialpose_dqn in amcl
