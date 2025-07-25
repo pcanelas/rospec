@@ -68,10 +68,9 @@ message alias RestrictedLoadMap: nav2_msgs/LoadMap {
 
 node type amcl_type {
     context distribution: AfterHumbleVersion;
-
-    param robot_model_type: Enum[DifferentialMotionModel, OmniMotionModel];
-	param scan_topic: string;
-    param map_topic: string;
+    optional param robot_model_type: Enum[DifferentialMotionModel, OmniMotionModel] = DifferentialMotionModel;
+	optional param scan_topic: string = "scan";
+    optional param map_topic: string = "map";
 
 	optional param alpha1: double = 0.2;
 	optional param alpha2: double = 0.2;
@@ -88,7 +87,7 @@ node type amcl_type {
     optional param laser_likelihood_max_dist: double = 2.0;
     optional param laser_max_range: double where {_ >= 0 or _ == -1} = 100.0;
     optional param laser_min_range: double where {_ >= 0.0 or _ == -1.0} = -1.0;
-	optional param laser_model_type: Enum[Beam, LikelihoodField, LikelihoodFieldProb] = LikelihoodField;
+	optional param laser_model_type: Enum[beam, likelihood_field, likelihood_field_prob] = likelihood_field;
     optional param set_initial_pose: bool = false;
     optional param initial_pose: geometry_msgs/Pose2D = geometry_msgs/Pose2D {
     	x = 0.0,
@@ -116,7 +115,7 @@ node type amcl_type {
     optional param z_rand: double = 0.5;
     optional param z_short: double = 0.005;
     optional param always_reset_initial_pose: bool = false;
-    optional param first_map_only: string = false;
+    optional param first_map_only: bool = false;
     optional param bond_heartbeat_period: double = 0.1;
 
     @qos{sensor_data_profile}
